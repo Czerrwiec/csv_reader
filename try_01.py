@@ -1,11 +1,10 @@
 import csv
-from docx import Document
 from odf.opendocument import OpenDocumentText
 from odf.style import Style, TextProperties
 from odf.text import H, P, Span
 
 
-with open ('C:\\Users\\Cad Projekt\\Desktop\\VS\\csv\\tomasz.czerwinski.csv', mode = 'r', encoding='utf-8') as file:
+with open ('C:\\Users\\Czerwiec\\Desktop\\VS Code work\\csv\\tomasz.czerwinski.csv', mode = 'r', encoding='utf-8') as file:
     csv_file = csv.reader(file)
     print()
     list_00 = []
@@ -27,18 +26,6 @@ with open ('C:\\Users\\Cad Projekt\\Desktop\\VS\\csv\\tomasz.czerwinski.csv', mo
         print(x)
         i = P(text = x)
         
-        o = Span(text = "to jest tekst z latorem")
-
-        k = Span(text = ". ")
-        m = Span(text = ". ")
-        n = Span(text = ". ")
-        l = Span(text = ". ")
-        
-        i.addElement(k)
-        i.addElement(m)
-        i.addElement(n)
-        i.addElement(l)
-        i.addElement(o)
         
         doc.text.addElement(i)
         # doc.text.addElement(o)
