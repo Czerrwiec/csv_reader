@@ -24,14 +24,12 @@ def get_version_number(file_path):
     
     except: return "-"
   
-                
+               
 
 def get_creation_date(path):
     time_created = time.ctime(os.path.getmtime(path))
     t_obj = time.strptime(time_created)
-    return  time.strftime("%d-%m-%Y", t_obj)
-
-
+    return  time.strftime("%Y-%m-%d %H:%M:%S", t_obj)
 
 
 # file_path = r'Z:\Testy\2024-05-14 4.0.7 hotfix\MainFiles\V4_I10x64\DoorsWindows.dll'
@@ -41,101 +39,110 @@ def get_creation_date(path):
 # print(version)
 
 
-path_name_dict = {}
-name_version_dict = {}
-version_data_dict = {}
-
-
-
-list_of_data = []
-
 dir_list = []
 name_list = []
 
 
-
-
-
-
 for (dirpath, dirnames, filenames) in walk("C:\\Users\\Czerwiec\\Desktop\\test_folder"):
 
+    # print(dirpath)
+    # print()
+    # print(dirnames)
+    # print()
+    # print(filenames)
+
+
     for f in filenames:
-
         path = (os.path.abspath(os.path.join(dirpath, f)))
-        
+
         # print(path)
+        # print()
+        # print(f)
         
-        # print(f) 
-        # print(get_version_number(path))
-        # print(get_creation_date(path))
-
-        x = f + " " + get_version_number(path) + " " + get_creation_date(path)
-
-
-       
-        list_of_data.append((f, get_version_number(path), get_creation_date(path)))
-    
+        name_list.append(f)
+        
+        
+        # print(os.path.basename(path))
         dir_list.append(path)
 
 
-path_name_dict = dict(zip(dir_list, list_of_data))
 
-# print(path_name_dict)
 
-# for i in path_name_dict.keys():
-    
-#     print(path_name_dict[i][0])
+# for u in dir_list:
+#     print(u)
 
 
 
 
-list = (list(path_name_dict.values()))
+# print(name_list)
 
-for i in list:
-    print(i[0])
-    
-    # print(list[i][0])
 
-    # if i[0] == list[i][0]:
-    #     print("lol")
 
-# print(list[1][0])
-
-# print(type(list[i][0]))
-
-# print(y[0][0])
-    # print(path_name_dict[i][0])
-# print(dir_list[0])
-# print(list_of_data[0])
 
     #     version_data_dict[get_version_number(path)] = get_creation_date(path)
 
+# for i in name_list:
+#     print(i)
 
-    #     # for y in version_data_dict:
-    #     #     print(y)
-    # print(version_data_dict)
-    
-    # for y, t in version_data_dict.items():
-    #     print(y, t)
  
+# a= [1, 2, 3, 2, 1, 5, 6, 5, 5, 5]
+# result=[d for d, item in enumerate(name_list) if item in name_list[:d]]
+
+# print(result) 
 
 
 
-
-# print(list_of_data)
-# print()
-# print()
-
-# print(path_name_dict)
-
-# print(version_data_dict)
-# print(name_version_dict)
-
-# for k, v in path_name_dict.items():
-#     print(k, v)
-# for i in dir_list:
-#     print(".".join(get_version_number(i)))
+# my_list = [1, 2, 3, 4, 2, 5, 6, 4]
+cuted = []
+indexes = []
+new = []
+ 
+for i, v in enumerate(name_list):
+    # print(i)
+    # print(v)
+    if name_list.count(v) > 1 and i not in indexes:
+        indexes.append(i)
+        cuted.append(v)
     
+   
+print(indexes)
+print(cuted)
+print()
+
+nList = []
+for index in indexes:
+    nList += [dir_list[index]]
+# print(nList)
+# print()
+list_of_creation_time = []
+
+for x in nList:
+    
+    print(get_creation_date(x))
+    # o = get_creation_date(x)
+    list_of_creation_time.append(get_creation_date(x))
+    # list_of_creation_time.append(o)
+    # for i in nList:
+    #     print(x)
+    #     list_of_creation_time.append(get_creation_date(x))
+
+
+p = list_of_creation_time.index(max(list_of_creation_time))
+# print(p)
+
+h = indexes[p+1:]
+
+print(h)
+
+# for t, h in enumerate(dir_list):
+#     print(t)
+#     print(h)
+
+
+
+for j in dir_list[:h[0]]:
+    print(j)
+
 
 
 
