@@ -7,9 +7,6 @@ from odf.opendocument import OpenDocumentText
 from odf.style import Style, TextProperties
 from odf.text import H, P, Span
 
-import operator
-from collections import OrderedDict
-
 
 source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
 
@@ -48,8 +45,7 @@ def get_creation_date(path):
 
 dir_list = []
 name_list = []
-
-path_dictionary = {}
+pathName_dictionary = {}
 
 
 for dirpath, dirnames, filenames in walk(
@@ -63,15 +59,15 @@ for dirpath, dirnames, filenames in walk(
         # print(os.path.basename(path))
         dir_list.append(path)
 
-        path_dictionary[path] = file_name
+        pathName_dictionary[path] = file_name
 
 
 cuted = []
 indexes = []
-new = []
+# new = []
 
-for i, v in enumerate(path_dictionary.values()):
-    if list(path_dictionary.values()).count(v) > 1 and i not in indexes:
+for i, v in enumerate(pathName_dictionary.values()):
+    if list(pathName_dictionary.values()).count(v) > 1 and i not in indexes:
         indexes.append(i)
         cuted.append(v)
         
@@ -96,6 +92,8 @@ for index in indexes:
     nList += [dir_list[index]]
 print(nList)
 print()
+
+
 list_of_creation_time = []
 
 for x in nList:
@@ -133,16 +131,16 @@ for index in sorted(list_of_indexes_to_delete, reverse=True):
     test_list.append(dir_list.pop(index))
     test_list.reverse()
 
-    for i, name in enumerate(list(path_dictionary.keys())):
+    for i, name in enumerate(list(pathName_dictionary.keys())):
         if index == i:
-            del path_dictionary[name]
+            del pathName_dictionary[name]
     
     
    
 
 print()
 
-for a, b in path_dictionary.items():
+for a, b in pathName_dictionary.items():
     print(a, b)
 print()
 for var_1,var_2 in enumerate(dir_list):
