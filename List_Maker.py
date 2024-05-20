@@ -8,10 +8,10 @@ from odf.style import Style, TextProperties
 from odf.text import H, P, Span
 
 
-#laptop:
-# source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"  
+# laptop:
+source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
 
-source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder"
+# source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder"
 
 # dir_list = []
 # filesNames_list = []
@@ -58,7 +58,6 @@ def make_path_list(folder_path):
             # próba z słownikiem
             pathName_dictionary[path] = file_name
     return pathName_dictionary
-        
 
 
 def sort_files_del_from_dict(filesList, dict, indexes):
@@ -66,7 +65,7 @@ def sort_files_del_from_dict(filesList, dict, indexes):
     # test_list = []
     for x in filesList:
         list_of_creation_time.append(get_creation_date(x))
-        
+
     sortedList = list_of_creation_time.index(max(list_of_creation_time))
     list_of_indexes_to_delete = indexes[sortedList + 1 :]
 
@@ -86,7 +85,7 @@ def make_list_to_cut(dict):
 
 
 def list_paths(i_list):
-    cuted_pathList = []  
+    cuted_pathList = []
     for index in i_list:
         pathList = list(paths.keys())
         cuted_pathList += [pathList[index]]
@@ -97,9 +96,7 @@ def list_paths(i_list):
 # var_01 = os.path.basename(path)
 
 
-
-
-#App START:
+# App START:
 
 paths = make_path_list(source_path)
 
@@ -108,20 +105,11 @@ indexesList = make_list_to_cut(paths)
 cuted_paths = list_paths(indexesList)
 
 
-
 # for a, b in sort_files_del_from_dict(cuted_paths, paths, indexesList).items():
 #     print(a)
 
 
-
-
-
-
-
-
-
 # csv próba
-
 
 
 def add_lines(list, module_name):
@@ -129,60 +117,64 @@ def add_lines(list, module_name):
         # print(i)
         # print(u)
         if i == 0:
-            f = H(outlinelevel=1, text = module_name)
+            f = H(outlinelevel=1, text=module_name)
             doc.text.addElement(f)
         # print(u)
-        i = P(text = u[0] + u[1] + u[2])
+        i = P(text=u[0] + u[1] + u[2])
         doc.text.addElement(i)
 
-        
 
 doc = OpenDocumentText()
 
 list_00 = []
 list_01 = []
-
+list_02 = []
 
 bug_dict = {}
 
-with open ("C:\\Users\\Czerwiec\\Desktop\\test_folder\csv\\tomasz.czerwinski.csv", mode = 'r', encoding='utf-8') as file:
+with open(
+    "C:\\Users\\Czerwiec\\Downloads\\tomasz.czerwinski.csv", mode="r", encoding="utf-8"
+) as file:
     csv_file = csv.reader(file)
     print()
-    
+
     # list_01 = []
-    
 
     for line in csv_file:
-        # print(line[0][3:] + "\t" + line[1])
+        print(line[0][3:] + "\t" + line[1])
         # print(line[3])
+        # print(line)
 
         if line[3] == "dokumentacja":
-            
-            # print("match")
-            # print(line[0][3:] + "\t" + line[1])          
-            # list_00.append(line[0][3:] + " " + line[1])
-            x = (line[0][3:], " ", line[1])
-            list_00.append(x)      
-            bug_dict["dokumentacja"] = list_00
-            # f = H(outlinelevel=1, text = "DOKUMENTACJA")
-            # doc.text.addElement(f)
-        
-        elif line[3] == "wizualizacja":
-            list_02 = []
             x = (line[0][3:], " ", line[1])
             list_00.append(x)
-            bug_dict["wizualizacja"] = list_02
+            bug_dict["dokumentacja"] = list_00
 
-       
+        elif line[3] == "konwerter":
+            u = (line[0][3:], " ", line[1])
+            list_02.append(u)
+            bug_dict["konwerter"] = list_02
+
 
 for i, j in bug_dict.items():
     if i == "dokumentacja":
-        f = H(outlinelevel=1, text = i.upper())
+        f = H(outlinelevel=1, text=i.upper())
         doc.text.addElement(f)
         # for h in j:
         for l in j:
-            print(l[0])
-                 
+            # print(l[0])
+            i = P(text=l[0] + l[1] + l[2])
+            doc.text.addElement(i)
+
+    elif i == "konwerter":
+        f = H(outlinelevel=1, text=i.upper())
+        doc.text.addElement(f)
+        # for h in j:
+        for l in j:
+            # print(l[0])
+            i = P(text=l[0] + l[1] + l[2])
+            doc.text.addElement(i)
+
     # i = P(text = j[0][0] + j[0][1] + j[0][2])
     # doc.text.addElement(i)
 
@@ -215,22 +207,15 @@ for i, j in bug_dict.items():
 #     doc.text.addElement(i)
 
 
-
-
-
-
 # add_lines(bugList, "DOKUMENTACJA")
 # add_lines(bugList2, "WIZUALIZACJA")
 
 
 doc.save("this is number 2.odt")
 
-        
 
-# for a in bug_dict.items():
-#     print(a)
-
-
+for a in bug_dict.items():
+    print(a)
 
 
 # for i, u in list(enumerate(bug_dict.values())):
