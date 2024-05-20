@@ -8,13 +8,16 @@ from odf.style import Style, TextProperties
 from odf.text import H, P, Span
 
 
-source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
+#laptop:
+# source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"  
 
-dir_list = []
-filesNames_list = []
-pathName_dictionary = {}
-cuted = []
-indexes = []
+source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder"
+
+# dir_list = []
+# filesNames_list = []
+# # pathName_dictionary = {}
+# cuted = []
+# # indexes = []
 
 
 def get_version_number(file_path):
@@ -45,6 +48,7 @@ def get_creation_date(path, long=True):
 
 
 def make_path_list(folder_path):
+    pathName_dictionary = {}
     for dirpath, dirnames, filenames in walk(folder_path):
         for file_name in filenames:
             path = os.path.abspath(os.path.join(dirpath, file_name))
@@ -53,9 +57,11 @@ def make_path_list(folder_path):
             # dir_list.append(path)
             # próba z słownikiem
             pathName_dictionary[path] = file_name
+    return pathName_dictionary
+        
 
 
-def sort_files_del_from_dict(filesList):
+def sort_files_del_from_dict(filesList, dict, indexes):
     list_of_creation_time = []
     # test_list = []
     for x in filesList:
@@ -65,32 +71,46 @@ def sort_files_del_from_dict(filesList):
     list_of_indexes_to_delete = indexes[sortedList + 1 :]
 
     for index in sorted(list_of_indexes_to_delete, reverse=True):
-        for i, name in enumerate(list(pathName_dictionary.keys())):
+        for i, name in enumerate(list(dict.keys())):
             if index == i:
-                del pathName_dictionary[name]
-    return pathName_dictionary
+                del dict[name]
+    return dict
 
 
+def make_list_to_cut(dict):
+    indexesToCut = []
+    for i, v in enumerate(dict.values()):
+        if list(dict.values()).count(v) > 1 and i not in indexesToCut:
+            indexesToCut.append(i)
+    return indexesToCut
+
+
+def list_paths(i_list):
+    cuted_pathList = []  
+    for index in i_list:
+        pathList = list(paths.keys())
+        cuted_pathList += [pathList[index]]
+    return cuted_pathList
 
 
 # przywoływanie nazwy pliku:
 # var_01 = os.path.basename(path)
 
 
-make_path_list(source_path)
 
 
-for i, v in enumerate(pathName_dictionary.values()):
-    if list(pathName_dictionary.values()).count(v) > 1 and i not in indexes:
-        indexes.append(i)
-        # cuted.append(v)
+#App START:
 
-cuted_pathList = []
+paths = make_path_list(source_path)
 
-for index in indexes:
-    pathList = list(pathName_dictionary.keys())
-    cuted_pathList += [pathList[index]]
+indexesList = make_list_to_cut(paths)
+
+cuted_paths = list_paths(indexesList)
 
 
-for a, b in sort_files_del_from_dict(cuted_pathList).items():
+
+for a, b in sort_files_del_from_dict(cuted_paths, paths, indexesList).items():
     print(a)
+
+
+
