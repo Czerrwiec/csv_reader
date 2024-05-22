@@ -9,9 +9,9 @@ from odf.text import H, P, Span
 
 
 # laptop:
-source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
+# source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
 
-# source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder"
+source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder"
 
 # dir_list = []
 # filesNames_list = []
@@ -133,7 +133,7 @@ list_02 = []
 bug_dict = {}
 
 with open(
-    "C:\\Users\\Czerwiec\\Downloads\\tomasz.czerwinski.csv", mode="r", encoding="utf-8"
+    "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski.csv", mode="r", encoding="utf-8"
 ) as file:
     csv_file = csv.reader(file)
     print()
