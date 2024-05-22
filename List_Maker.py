@@ -1,6 +1,7 @@
 import os
 from os import walk
 from win32api import *
+from datetime import date
 import time
 import csv
 from odf.opendocument import OpenDocumentText
@@ -104,6 +105,11 @@ def make_bug_dict(file, m_name):
     return bug_dict
 
 
+def save_with_current_day(document):
+    doc_name = str(date.today())
+    x = doc_name.replace("-", ".")
+    document.save(f"{x} x64.odt")
+
 # przywoływanie nazwy pliku:
 # var_01 = os.path.basename(path)
 
@@ -118,6 +124,7 @@ cuted_paths = list_paths(indexesList)
 
 doc = OpenDocumentText()
 
+
 with open(
     "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski.csv", mode="r", encoding="utf-8") as file:
     csv_file = csv.reader(file)
@@ -128,6 +135,13 @@ with open(
 
 make_lines("dokumentacja", bug_dict.items(), doc)
 
+save_with_current_day(doc)
 
-doc.save("this is number 2.odt")
 
+
+#wstępne listy z kategoriami bugów
+
+all_programs = ['CAD', 'CAD Licencja', 'Dystrybutor baz', 'Instalator', 'Konwerter mdb', 'Marketing', 'Panel aktualizacji', 'Podesty', 'Tłumaczenia', 'aktualizator internetowy', 'analytics', 'asystent pobierania', 'bazy danych', 'deinstalator', 'dokumentacja', 'dot4cad', 'drzwi i okna', 'edytor bazy płytek', 'edytor szafek bazy kuchennej', 'edytor szafek użytkownika', 'edytor ścian', 'elementy dowolne', 'export3D', 'instalator baz danych', 'instalator programu', 'konwerter', 'kreator ścian', 'launcher', 'listwy', 'manager', 'obrót 3d / przesuń', 'obserVeR', 'przeglądarka PDF', 'render', 'szafy wnękowe', 'ukrywacz', 'wersja Leroy Merlin', 'wersja Obi', 'wizualizacja', 'wstawianie elementów wnętrzarskich', 'wstawianie elementów wnętrzarskich w wizualizacji', 'zestawienie płytek, farb, fug, klejów']
+
+
+kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennych', 'wycena']
