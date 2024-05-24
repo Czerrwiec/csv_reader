@@ -147,19 +147,32 @@ with open(csv_path, mode="r", encoding="utf-8") as file:
     data = [tuple(row) for row in csv_file]
 
     cat_list_with_duplicates = []
+    cat_list_with_duplicates02 = []
+
 
     for i in data:
-        if i[3].lower() != "projekt":
+
+        
+        if i[3].lower() != "projekt" and i[3] in all_programs:
             cat_list_with_duplicates.append(i[3])
             cat_list = []
             [cat_list.append(x) for x in cat_list_with_duplicates if x not in cat_list]
-        
-       
+
+        elif i[3] in kitchen_pro:
+            cat_list_with_duplicates02.append(i[3])
+            cat_list02 = []
+            [cat_list02.append(x) for x in cat_list_with_duplicates02 if x not in cat_list02]
+
+
+
 
     for category in cat_list:
         make_bug_dict(data, category)
         make_lines(category, bug_dict.items(), doc)
 
+    for category in cat_list02:
+        make_bug_dict(data, category)
+        make_lines(category, bug_dict.items(), doc)
    
  
 save_with_current_day(doc)
