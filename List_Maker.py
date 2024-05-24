@@ -1,7 +1,7 @@
 import os
 from os import walk
 from win32api import *
-from datetime import date
+from datetime import datetime
 import time
 import csv
 from odf.opendocument import OpenDocumentText
@@ -9,13 +9,16 @@ from odf.style import Style, TextProperties
 from odf.text import H, P, Span
 
 
+
 # laptop:
 # source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
 
 source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder"
-
+csv_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski.csv"
 
 bug_dict = {}
+bug_dict02 = {}
+
 
 def get_version_number(file_path):
     try:
@@ -95,23 +98,37 @@ def make_lines(m_name, data_dict, document):
                 document.text.addElement(line_)
 
 
-def make_bug_dict(file, m_name):
+
+def make_bug_dict(file, m_name): 
+    
     list_00 = []
     for line in file:
         if line[3] == m_name:
+            # print(line[3])
             var_01 = (line[0][3:], " ", line[1])
+            
             list_00.append(var_01)
-            bug_dict[m_name] = list_00
+    bug_dict.update({m_name : list_00}) 
+    # print(list_00)
+    # bug_dict.update({m_name : list_00})  
+    # bug_dict[m_name] = list_00
     return bug_dict
 
 
 def save_with_current_day(document):
-    doc_name = str(date.today())
-    x = doc_name.replace("-", ".")
-    document.save(f"{x} x64.odt")
+    doc_name = datetime.today().strftime('%d.%m.%Y')
+    document.save(f"{doc_name}.odt")
 
 # przywoływanie nazwy pliku:
 # var_01 = os.path.basename(path)
+
+
+
+all_programs = ['CAD', 'CAD Licencja', 'Dystrybutor baz', 'Instalator', 'Konwerter mdb', 'Marketing', 'Panel aktualizacji', 'Podesty', 'Tłumaczenia', 'aktualizator internetowy', 'analytics', 'asystent pobierania', 'bazy danych', 'deinstalator', 'dokumentacja', 'dot4cad', 'drzwi i okna', 'edytor bazy płytek', 'edytor szafek bazy kuchennej', 'edytor szafek użytkownika', 'edytor ścian', 'elementy dowolne', 'export3D', 'instalator baz danych', 'instalator programu', 'konwerter', 'kreator ścian', 'launcher', 'listwy', 'manager', 'obrót 3d / przesuń', 'obserVeR', 'przeglądarka PDF', 'render', 'szafy wnękowe', 'ukrywacz', 'wersja Leroy Merlin', 'wersja Obi', 'wizualizacja', 'wstawianie elementów wnętrzarskich', 'wstawianie elementów wnętrzarskich w wizualizacji', 'zestawienie płytek, farb, fug, klejów']
+
+kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennych', 'wycena']
+
+
 
 # App START:
 
@@ -121,27 +138,34 @@ indexesList = make_list_to_cut(paths)
 
 cuted_paths = list_paths(indexesList)
 
-
 doc = OpenDocumentText()
 
 
-with open(
-    "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski.csv", mode="r", encoding="utf-8") as file:
+with open(csv_path, mode="r", encoding="utf-8") as file:
     csv_file = csv.reader(file)
+
+    data = [tuple(row) for row in csv_file]
+
+    cat_list_with_duplicates = []
+
+    for i in data:
+        if i[3].lower() != "projekt":
+            cat_list_with_duplicates.append(i[3])
+            cat_list = []
+            [cat_list.append(x) for x in cat_list_with_duplicates if x not in cat_list]
+        
+       
+
+    for category in cat_list:
+        make_bug_dict(data, category)
+        make_lines(category, bug_dict.items(), doc)
+
    
-
-    make_bug_dict(csv_file, "dokumentacja")
-
-
-make_lines("dokumentacja", bug_dict.items(), doc)
-
+ 
 save_with_current_day(doc)
 
 
 
-#wstępne listy z kategoriami bugów
-
-all_programs = ['CAD', 'CAD Licencja', 'Dystrybutor baz', 'Instalator', 'Konwerter mdb', 'Marketing', 'Panel aktualizacji', 'Podesty', 'Tłumaczenia', 'aktualizator internetowy', 'analytics', 'asystent pobierania', 'bazy danych', 'deinstalator', 'dokumentacja', 'dot4cad', 'drzwi i okna', 'edytor bazy płytek', 'edytor szafek bazy kuchennej', 'edytor szafek użytkownika', 'edytor ścian', 'elementy dowolne', 'export3D', 'instalator baz danych', 'instalator programu', 'konwerter', 'kreator ścian', 'launcher', 'listwy', 'manager', 'obrót 3d / przesuń', 'obserVeR', 'przeglądarka PDF', 'render', 'szafy wnękowe', 'ukrywacz', 'wersja Leroy Merlin', 'wersja Obi', 'wizualizacja', 'wstawianie elementów wnętrzarskich', 'wstawianie elementów wnętrzarskich w wizualizacji', 'zestawienie płytek, farb, fug, klejów']
 
 
-kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennych', 'wycena']
+
