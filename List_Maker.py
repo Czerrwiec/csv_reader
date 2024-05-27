@@ -5,8 +5,13 @@ from datetime import datetime
 import time
 import csv
 from odf.opendocument import OpenDocumentText
-from odf.style import Style, TextProperties
+from odf.style import Style, TextProperties, ParagraphProperties, TabStop, TabStops
 from odf.text import H, P, Span
+
+
+all_programs = ['CAD', 'CAD Licencja', 'Dystrybutor baz', 'Instalator', 'Konwerter mdb', 'Marketing', 'Panel aktualizacji', 'Podesty', 'Tłumaczenia', 'aktualizator internetowy', 'analytics', 'asystent pobierania', 'bazy danych', 'deinstalator', 'dokumentacja', 'dot4cad', 'drzwi i okna', 'edytor bazy płytek', 'edytor szafek bazy kuchennej', 'edytor szafek użytkownika', 'edytor ścian', 'elementy dowolne', 'export3D', 'instalator baz danych', 'instalator programu', 'konwerter', 'kreator ścian', 'launcher', 'listwy', 'manager', 'obrót 3d / przesuń', 'obserVeR', 'przeglądarka PDF', 'render', 'szafy wnękowe', 'ukrywacz', 'wersja Leroy Merlin', 'wersja Obi', 'wizualizacja', 'wstawianie elementów wnętrzarskich', 'wstawianie elementów wnętrzarskich w wizualizacji', 'zestawienie płytek, farb, fug, klejów']
+
+kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennych', 'wycena']
 
 
 # laptop:
@@ -41,7 +46,7 @@ def get_creation_date(path, long=True):
     if long == True:
         return time.strftime("%Y-%m-%d %H:%M:%S", t_obj)
     elif long == False:
-        return time.strftime("%Y-%m-%d", t_obj)
+        return time.strftime("%d.%m.%Y", t_obj)
 
 
 def make_path_list(folder_path):
@@ -85,17 +90,17 @@ def list_paths(i_list, paths):
     return cuted_pathList
 
 
-def add_lines_to_lists(data_file):
+def add_lines_to_lists(data_file, all_list, rest_list):
 
     cat_list_with_duplicates = []
     cat_list_with_duplicates02 = []
 
     for line in data_file:
-        if line[3].lower() != "projekt" and line[3] in all_programs:
+        if line[3].lower() != "projekt" and line[3] in all_list:
             cat_list_with_duplicates.append(line[3])
             cat_list = []
             [cat_list.append(x) for x in cat_list_with_duplicates if x not in cat_list]
-        elif line[3] in kitchen_pro:
+        elif line[3] in rest_list:
             cat_list_with_duplicates02.append(line[3])
             cat_list02 = []
             [cat_list02.append(x) for x in cat_list_with_duplicates02 if x not in cat_list02]
@@ -104,10 +109,16 @@ def add_lines_to_lists(data_file):
 def make_lines(m_name, data_dict, document):
     for key, value in data_dict:
         if key == m_name:
-            headline = H(outlinelevel=1, text=key.upper())
+            headline = H(outlinelevel=1, stylename=heading02_style, text=key.upper())
+            make_add_paragraph("", document)
             document.text.addElement(headline)
+            make_add_paragraph("", document)
+            
             for line in value:
-                line_ = P(text= line[0] + line[1] + line[2])
+                line_ = P(stylename=paragraph_style00, text="")
+                boldpart = Span(stylename=boldstyle, text=line[0])
+                line_.addElement(boldpart)       
+                line_.addText(line[1] + "  -  " + line[2])
                 document.text.addElement(line_)
 
 
@@ -125,7 +136,6 @@ def save_with_current_day(document):
     doc_name = datetime.today().strftime('%d.%m.%Y')
     document.save(f"{doc_name}.odt")
 
-
 def write_changed_files(dict_of_files):
     list_of_lines_to_write = []
     for key, value in dict_of_files.items():
@@ -135,13 +145,13 @@ def write_changed_files(dict_of_files):
         list_of_lines_to_write.append(f"{file_name} {file_version} {file_creation_date}")
     return list_of_lines_to_write
 
-# przywoływanie nazwy pliku:
-# var_01 = os.path.basename(path)
+def make_add_paragraph(text, document):
+    var_01 = P(text = text)
+    document.text.addElement(var_01)
 
-
-all_programs = ['CAD', 'CAD Licencja', 'Dystrybutor baz', 'Instalator', 'Konwerter mdb', 'Marketing', 'Panel aktualizacji', 'Podesty', 'Tłumaczenia', 'aktualizator internetowy', 'analytics', 'asystent pobierania', 'bazy danych', 'deinstalator', 'dokumentacja', 'dot4cad', 'drzwi i okna', 'edytor bazy płytek', 'edytor szafek bazy kuchennej', 'edytor szafek użytkownika', 'edytor ścian', 'elementy dowolne', 'export3D', 'instalator baz danych', 'instalator programu', 'konwerter', 'kreator ścian', 'launcher', 'listwy', 'manager', 'obrót 3d / przesuń', 'obserVeR', 'przeglądarka PDF', 'render', 'szafy wnękowe', 'ukrywacz', 'wersja Leroy Merlin', 'wersja Obi', 'wizualizacja', 'wstawianie elementów wnętrzarskich', 'wstawianie elementów wnętrzarskich w wizualizacji', 'zestawienie płytek, farb, fug, klejów']
-
-kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennych', 'wycena']
+def make_add_heading(text, document):
+    var_01 = H(outlinelevel=1, stylename=heading01_style, text = text)
+    document.text.addElement(var_01)
 
 
 
@@ -158,31 +168,60 @@ target_paths = sort_files_del_from_dict(cuted_paths, all_paths, indexesList)
 
 
 doc = OpenDocumentText()
+doc_s = doc.styles
+
+heading01_style = Style(name="Heading 1", family="paragraph")
+heading01_style.addElement(TextProperties(attributes={"fontsize":"18pt","fontweight":"bold"}))
+heading01_style.addElement(ParagraphProperties(attributes={"textalign": "center"}))
+doc_s.addElement(heading01_style)
+
+heading02_style = Style(name="Heading 2", family="paragraph")
+heading02_style.addElement(TextProperties(attributes={'fontsize':"14pt",'fontweight':"bold" }))
+doc_s.addElement(heading02_style)
+
+boldstyle = Style(name="Bold", family="text")
+boldstyle.addElement(TextProperties(attributes={"fontweight": "bold"}))
+doc_s.addElement(boldstyle)
+
+paragraph_style00 = Style(name="paragraph", family="paragraph")
+paragraph_style00.addElement(TextProperties(attributes={"fontsize": "13pt"}))
+doc_s.addElement(paragraph_style00)
 
 
 with open(csv_path, mode="r", encoding="utf-8") as file:
     csv_file = csv.reader(file)
-
     data = [tuple(row) for row in csv_file]
 
 
-    cat_list, cat_list02 = add_lines_to_lists(data)
+cat_list, cat_list02 = add_lines_to_lists(data, all_programs, kitchen_pro)
+
+#trzeba dopisać do add_lines_to_lists że jak 1 czy 2 lista jest pusta to nic się nie ma dziać dalej
+
+make_add_heading("ZMIANY DLA WSZYSTKICH PROGRAMÓW:", doc)
+make_add_paragraph("", doc)
 
 
-    for category in cat_list:
-        make_bug_dict(data, category)
-        make_lines(category, bug_dict.items(), doc)
+for category in cat_list:
+    make_bug_dict(data, category)
+    make_lines(category, bug_dict.items(), doc)
 
-    for category in cat_list02:
-        make_bug_dict(data, category)
-        make_lines(category, bug_dict.items(), doc)
+# do zrobienia: trzeba uzależnić dodawanie headingu od tego czy są w ogóle bugi do wszystkich i dalej podobnie z drugą listą -
+# jeśli druga lista jest pusta to nie dodawać headingu od decora pro i kuchnii
+
+make_add_paragraph("", doc)
+
+make_add_heading("Zmiany dla CAD Kuchnie i CAD Decor Pro:", doc)
+make_add_paragraph("", doc)
+
+for category in cat_list02:
+    make_bug_dict(data, category)
+    make_lines(category, bug_dict.items(), doc)
 
  
-line0 = P(text = " ")
-line = P(text= "ZMIENIONE PLIKI:")
+make_add_paragraph(" ", doc)
+make_add_paragraph("ZMIENIONE PLIKI:", doc)
+make_add_paragraph("", doc)
 
-doc.text.addElement(line0)
-doc.text.addElement(line)
 
 list_of_lines = write_changed_files(target_paths)
 
@@ -190,6 +229,10 @@ for line in list_of_lines:
     doc.text.addElement(P(text = line))
 
 save_with_current_day(doc)
+
+
+# dobrze byłoby zrobić otwieranie listy z nazwami programów z json file
+# trzeba ogarnąć jak dodawać puste linie
 
 
 
