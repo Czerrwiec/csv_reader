@@ -5,7 +5,7 @@ from datetime import datetime
 import time
 import csv
 from odf.opendocument import OpenDocumentText
-from odf.style import Style, TextProperties, ParagraphProperties, TabStop, TabStops
+from odf.style import Style, TextProperties, ParagraphProperties
 from odf.text import H, P, Span
 
 
@@ -15,11 +15,11 @@ kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennyc
 
 
 # laptop:
-source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
-csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS code workplaces\\tomasz.czerwinski.csv"
+# source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
+# csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS code workplaces\\tomasz.czerwinski.csv"
 
-# source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder"
-# csv_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski.csv"
+source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\2024-05-15 4.0.8"
+csv_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski.csv"
 
 bug_dict = {}
 
@@ -60,10 +60,9 @@ def make_path_list(folder_path):
 
 def sort_files_del_from_dict(filesList, dict, indexes):
     list_of_creation_time = []
-
     for x in filesList:
         list_of_creation_time.append(get_creation_date(x))
-
+    
     sortedList = list_of_creation_time.index(max(list_of_creation_time))
     list_of_indexes_to_delete = indexes[sortedList + 1 :]
 
@@ -71,6 +70,10 @@ def sort_files_del_from_dict(filesList, dict, indexes):
         for i, name in enumerate(list(dict.keys())):
             if index == i:
                 del dict[name]
+            
+    for i in list(dict.keys()):
+        if i.endswith("txt") == True:
+            del dict[i]
     return dict
 
 
@@ -106,10 +109,11 @@ def add_lines_to_lists(data_file, all_list, rest_list):
             [cat_list02.append(x) for x in cat_list_with_duplicates02 if x not in cat_list02]
     return cat_list, cat_list02
 
+
 def make_lines(m_name, data_dict, document):
     for key, value in data_dict:
         if key == m_name:
-            headline = H(outlinelevel=1, stylename=heading02_style, text=key.upper())
+            headline = H(outlinelevel=1, stylename=heading03_style, text=key.upper())
             make_add_paragraph("", document)
             document.text.addElement(headline)
             make_add_paragraph("", document)
@@ -146,13 +150,12 @@ def write_changed_files(dict_of_files):
     return list_of_lines_to_write
 
 def make_add_paragraph(text, document):
-    var_01 = P(text = text)
+    var_01 = P(stylename=paragraph_style00, text = text)
     document.text.addElement(var_01)
 
 def make_add_heading(text, document):
     var_01 = H(outlinelevel=1, stylename=heading01_style, text = text)
     document.text.addElement(var_01)
-
 
 
 
@@ -171,20 +174,36 @@ doc = OpenDocumentText()
 doc_s = doc.styles
 
 heading01_style = Style(name="Heading 1", family="paragraph")
-heading01_style.addElement(TextProperties(attributes={"fontsize":"18pt","fontweight":"bold"}))
+heading01_style.addElement(TextProperties(attributes={"fontsize":"16pt","fontweight":"bold", 'fontfamily':"Calibri"}))
 heading01_style.addElement(ParagraphProperties(attributes={"textalign": "center"}))
 doc_s.addElement(heading01_style)
 
 heading02_style = Style(name="Heading 2", family="paragraph")
-heading02_style.addElement(TextProperties(attributes={'fontsize':"14pt",'fontweight':"bold" }))
+heading02_style.addElement(TextProperties(attributes={"fontsize":"14pt","fontweight":"bold", 'fontfamily':"Calibri"}))
+heading02_style.addElement(ParagraphProperties(attributes={"textalign": "center"}))
 doc_s.addElement(heading02_style)
+
+heading03_style = Style(name="Heading 3", family="paragraph")
+heading03_style.addElement(TextProperties(attributes={'fontsize':"11pt",'fontweight':"bold", 'fontfamily':"Calibri"}))
+doc_s.addElement(heading03_style)
+
+
+underline_style = Style(name="Underline", family="text")
+u_prop = TextProperties(attributes={
+    "textunderlinestyle":"solid",
+    "textunderlinewidth":"auto",
+    "textunderlinecolor":"font-color"
+    })
+
+underline_style.addElement(u_prop)
+doc_s.addElement(underline_style)
 
 boldstyle = Style(name="Bold", family="text")
 boldstyle.addElement(TextProperties(attributes={"fontweight": "bold"}))
 doc_s.addElement(boldstyle)
 
-paragraph_style00 = Style(name="paragraph", family="paragraph")
-paragraph_style00.addElement(TextProperties(attributes={"fontsize": "13pt"}))
+paragraph_style00 = Style(name="paragraph", family="paragraph",)
+paragraph_style00.addElement(TextProperties(attributes={"fontsize": "11pt", 'fontfamily':"Calibri"}))
 doc_s.addElement(paragraph_style00)
 
 
@@ -196,8 +215,15 @@ with open(csv_path, mode="r", encoding="utf-8") as file:
 cat_list, cat_list02 = add_lines_to_lists(data, all_programs, kitchen_pro)
 
 #trzeba dopisać do add_lines_to_lists że jak 1 czy 2 lista jest pusta to nic się nie ma dziać dalej
+make_add_heading(f"Aktualizacja z dnia {datetime.today().strftime('%d.%m.%Y')} ", doc)
+make_add_paragraph("", doc)
 
-make_add_heading("ZMIANY DLA WSZYSTKICH PROGRAMÓW:", doc)
+
+heading_0 = H(outlinelevel=1, stylename=heading02_style, text = "")
+underlinedpart = Span(stylename=underline_style, text="Zmiany wspólne dla programów CAD Decor PRO i CAD Decor oraz CAD Kuchnie")
+heading_0.addElement(underlinedpart)
+doc.text.addElement(heading_0)
+
 make_add_paragraph("", doc)
 
 
@@ -210,7 +236,13 @@ for category in cat_list:
 
 make_add_paragraph("", doc)
 
-make_add_heading("Zmiany dla CAD Kuchnie i CAD Decor Pro:", doc)
+# make_add_heading("Zmiany wspólne dla programów CAD Decor PRO oraz CAD Kuchnie", doc)
+
+heading_1 = H(outlinelevel=1, stylename=heading02_style, text = "")
+underlinedpart = Span(stylename=underline_style, text="Zmiany wspólne dla programów CAD Decor PRO oraz CAD Kuchnie")
+heading_1.addElement(underlinedpart)
+doc.text.addElement(heading_1)
+
 make_add_paragraph("", doc)
 
 for category in cat_list02:
@@ -218,15 +250,18 @@ for category in cat_list02:
     make_lines(category, bug_dict.items(), doc)
 
  
-make_add_paragraph(" ", doc)
+make_add_paragraph("", doc)
+make_add_paragraph("", doc)
 make_add_paragraph("ZMIENIONE PLIKI:", doc)
 make_add_paragraph("", doc)
 
+# posortować listę bez case sensitivity
 
 list_of_lines = write_changed_files(target_paths)
 
+
 for line in list_of_lines:
-    doc.text.addElement(P(text = line))
+    doc.text.addElement(P(stylename=paragraph_style00, text = line))
 
 save_with_current_day(doc)
 
