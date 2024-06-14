@@ -19,7 +19,7 @@ kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennyc
 # csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS code workplaces\\tomasz.czerwinski.csv"
 
 source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\2024-05-15 4.0.8"
-csv_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski.csv"
+csv_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski(1).csv"
 
 bug_dict = {}
 
@@ -94,21 +94,39 @@ def list_paths(i_list, paths):
 
 
 def add_lines_to_lists(data_file, all_list, rest_list):
-
     cat_list_with_duplicates = []
     cat_list_with_duplicates02 = []
+    cat_list_LM_with_duplicates = []
+    cat_list_OBI_with_duplicates = []
+    cat_list_OBI = []
+    cat_list_LM = []
+    cat_list02 = []
+    cat_list = []
 
-    for line in data_file:
-        if line[3].lower() != "projekt" and line[3] in all_list:
+    for line in data_file:    
+        
+        if line[3].lower() == "wersja obi":
+            cat_list_OBI_with_duplicates.append(line[3])
+            cat_list_OBI = []
+            [cat_list_OBI.append(x) for x in cat_list_OBI_with_duplicates if x not in cat_list_OBI]
+            
+        elif line[3].lower() == "wersja leroy merlin":
+            cat_list_LM_with_duplicates.append(line[3])
+            cat_list_LM = []
+            [cat_list_LM.append(x) for x in cat_list_LM_with_duplicates if x not in cat_list_LM]
+
+        elif line[3].lower() != "projekt" and line[3] in all_list:
             cat_list_with_duplicates.append(line[3])
             cat_list = []
-            [cat_list.append(x) for x in cat_list_with_duplicates if x not in cat_list]
+            [cat_list.append(x) for x in cat_list_with_duplicates if x not in cat_list]    
+
         elif line[3] in rest_list:
             cat_list_with_duplicates02.append(line[3])
             cat_list02 = []
             [cat_list02.append(x) for x in cat_list_with_duplicates02 if x not in cat_list02]
-    return cat_list, cat_list02
 
+    return cat_list, cat_list02, cat_list_LM, cat_list_OBI
+    
 
 def make_lines(m_name, data_dict, document):
     for key, value in data_dict:
@@ -116,7 +134,6 @@ def make_lines(m_name, data_dict, document):
             headline = H(outlinelevel=1, stylename=heading03_style, text=key.upper())
             make_add_paragraph("", document)
             document.text.addElement(headline)
-            make_add_paragraph("", document)
             
             for line in value:
                 line_ = P(stylename=paragraph_style00, text="")
@@ -185,6 +202,7 @@ doc_s.addElement(heading02_style)
 
 heading03_style = Style(name="Heading 3", family="paragraph")
 heading03_style.addElement(TextProperties(attributes={'fontsize':"11pt",'fontweight':"bold", 'fontfamily':"Calibri"}))
+heading03_style.addElement(ParagraphProperties(lineheight="145%"))
 doc_s.addElement(heading03_style)
 
 
@@ -204,6 +222,7 @@ doc_s.addElement(boldstyle)
 
 paragraph_style00 = Style(name="paragraph", family="paragraph",)
 paragraph_style00.addElement(TextProperties(attributes={"fontsize": "11pt", 'fontfamily':"Calibri"}))
+paragraph_style00.addElement(ParagraphProperties(lineheight="135%"))
 doc_s.addElement(paragraph_style00)
 
 
@@ -212,18 +231,19 @@ with open(csv_path, mode="r", encoding="utf-8") as file:
     data = [tuple(row) for row in csv_file]
 
 
-cat_list, cat_list02 = add_lines_to_lists(data, all_programs, kitchen_pro)
+
+cat_list, cat_list02, cat_list_LM, cat_list_OBI  = add_lines_to_lists(data, all_programs, kitchen_pro)
+
+
 
 #trzeba dopisać do add_lines_to_lists że jak 1 czy 2 lista jest pusta to nic się nie ma dziać dalej
 make_add_heading(f"Aktualizacja z dnia {datetime.today().strftime('%d.%m.%Y')} ", doc)
 make_add_paragraph("", doc)
 
-
 heading_0 = H(outlinelevel=1, stylename=heading02_style, text = "")
 underlinedpart = Span(stylename=underline_style, text="Zmiany wspólne dla programów CAD Decor PRO i CAD Decor oraz CAD Kuchnie")
 heading_0.addElement(underlinedpart)
 doc.text.addElement(heading_0)
-
 make_add_paragraph("", doc)
 
 
@@ -231,36 +251,57 @@ for category in cat_list:
     make_bug_dict(data, category)
     make_lines(category, bug_dict.items(), doc)
 
-# do zrobienia: trzeba uzależnić dodawanie headingu od tego czy są w ogóle bugi do wszystkich i dalej podobnie z drugą listą -
-# jeśli druga lista jest pusta to nie dodawać headingu od decora pro i kuchnii
 
-make_add_paragraph("", doc)
+# spróbować usunąć powtarzający się kod
 
-# make_add_heading("Zmiany wspólne dla programów CAD Decor PRO oraz CAD Kuchnie", doc)
 
-heading_1 = H(outlinelevel=1, stylename=heading02_style, text = "")
-underlinedpart = Span(stylename=underline_style, text="Zmiany wspólne dla programów CAD Decor PRO oraz CAD Kuchnie")
-heading_1.addElement(underlinedpart)
-doc.text.addElement(heading_1)
+if len(cat_list02) > 0:
+    make_add_paragraph("", doc)
+    heading_1 = H(outlinelevel=1, stylename=heading02_style, text = "")
+    underlinedpart = Span(stylename=underline_style, text="Zmiany wspólne dla programów CAD Decor PRO oraz CAD Kuchnie")
+    heading_1.addElement(underlinedpart)
+    doc.text.addElement(heading_1)
+    make_add_paragraph("", doc)
 
-make_add_paragraph("", doc)
+    for category in cat_list02:
+        make_bug_dict(data, category)
+        make_lines(category, bug_dict.items(), doc)
 
-for category in cat_list02:
-    make_bug_dict(data, category)
-    make_lines(category, bug_dict.items(), doc)
 
- 
-make_add_paragraph("", doc)
+if len(cat_list_LM) > 0:
+    make_add_paragraph("", doc)
+    heading_2 = H(outlinelevel=1, stylename=heading02_style, text = "")
+    underlinedpart = Span(stylename=underline_style, text="Zmiany dla programu w wersji LM")
+    heading_2.addElement(underlinedpart)
+    doc.text.addElement(heading_2)
+    make_add_paragraph("", doc)
+
+    for category in cat_list_LM:
+        make_bug_dict(data, category)
+        make_lines(category, bug_dict.items(), doc)
+
+
+if len(cat_list_OBI) > 0:
+    make_add_paragraph("", doc)
+    heading_3 = H(outlinelevel=1, stylename=heading02_style, text = "")
+    underlinedpart = Span(stylename=underline_style, text="Zmiany dla programu w wersji OBI")
+    heading_3.addElement(underlinedpart)
+    doc.text.addElement(heading_3)
+    make_add_paragraph("", doc)
+
+    for category in cat_list_OBI:
+        make_bug_dict(data, category)
+        make_lines(category, bug_dict.items(), doc)
+
+
 make_add_paragraph("", doc)
 make_add_paragraph("ZMIENIONE PLIKI:", doc)
-make_add_paragraph("", doc)
 
-# posortować listę bez case sensitivity
 
 list_of_lines = write_changed_files(target_paths)
+sorted_list_of_lines = sorted(list_of_lines, key=str.casefold)
 
-
-for line in list_of_lines:
+for line in sorted_list_of_lines:
     doc.text.addElement(P(stylename=paragraph_style00, text = line))
 
 save_with_current_day(doc)
