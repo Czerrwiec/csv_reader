@@ -1,0 +1,35 @@
+﻿Identyfikator,Temat,Status,Projekt,Priorytet,Plik 1,Plik 2,Pliki inne,Data zgłoszenia
+0007081,Jeśli zmienimy agd w wstawionej szafce a następnie zedytujemy którykolwiek wymiar szafki - wraca sprzęt agd sprzed zmiany.,zwrócony,wstawianie szafek kuchennych,wysoki,,,,2024-02-15
+0006964,nie można otworzyć instrukcji instalacji programu,zamknięty,instalator programu,niski, Setup.exe 2.0.0.1001,,,2024-01-10
+0000256,"Asystent pobierania jest w starym stylu graficznym, kiedy wszystkie inne programy maja nową szatę graficzna instalatorów",zamknięty,asystent pobierania,normalny,asystent_pobierania.exe ver 1.0.5.1,,,2018-12-20
+0006258,Różnice w kolorystyce blatów po ich skopiowaniu,zwrócony,blaty,normalny,blaty.dll 4.0.6.4,blaty.dll 4.0.6.5,,2023-07-12
+0007362,Reorganizacja bibliotek CAD Licencji,rozwiązany,CAD Licencja,wysoki,CadLicense.msi 1.2.10001,,,2024-04-22
+0007484,Wybieranie trybu licencjonowania,rozwiązany,CAD Licencja,wysoki,CadLicense.msi 1.2.10001,agd.dll 4.0.9.10001,"blaty.dll 4.0.9.10001, CADDecorPro.exe 4.0.9.10001, CADDecor.exe 4.0.9.10001, CADKuchnie.exe 8.0.9.10001, dodatki.dll 4.0.9.10001, kafle.dll 4.0.9.10001, konwerter3d.dll 4.0.9.10001, listwy.dll 4.0.9.10001, Manager.dll 8.0.9.10001, PlytkiEdytorBaze.exe 4.",2024-06-04
+0007487,Blokowanie działania licencji online na starszej wersji programu,rozwiązany,CAD Licencja,wysoki,CadLicense.msi 1.2.10001,agd.dll 4.0.9.10001,"blaty.dll 4.0.9.10001, CADDecorPro.exe 4.0.9.10001, CADDecor.exe 4.0.9.10001, CADKuchnie.exe 8.0.9.10001, dodatki.dll 4.0.9.10001, kafle.dll 4.0.9.10001, konwerter3d.dll 4.0.9.10001, listwy.dll 4.0.9.10001, Manager.dll 8.0.9.10001, PlytkiEdytorBaze.exe 4.",2024-06-04
+0007488,Obsługa licencji online próbnej,rozwiązany,CAD Licencja,wysoki,CadLicense.msi 1.2.10001,agd.dll 4.0.9.10001,"blaty.dll 4.0.9.10001, CADDecorPro.exe 4.0.9.10001, CADDecor.exe 4.0.9.10001, CADKuchnie.exe 8.0.9.10001, dodatki.dll 4.0.9.10001, kafle.dll 4.0.9.10001, konwerter3d.dll 4.0.9.10001, listwy.dll 4.0.9.10001, Manager.dll 8.0.9.10001, PlytkiEdytorBaze.exe 4.",2024-06-04
+0007485,Dodaj możliwość zamykania splasha launchera,zamknięty,CAD Licencja,normalny,CadLicense.msi 1.2.10001,CADDecorPro.exe 4.0.9.10001,"CADDecorPro.exe 4.0.9.10001, CADDecor.exe 4.0.9.10001, CADKuchnie.exe 8.0.9.10001",2024-06-04
+0006863,CR wiesza się na wydruku etykiet poprzedzonym wydrukiem listy formatek,rozwiązany,CAD Rozkrój,pilny,CADRozkroj4.exe 4.1.11.2,,,2023-12-05
+0006603,"braki w tabeli  ""import szaf wnękowych""",zamknięty,CAD Rozkrój,wysoki,CADRozkroj4.exe 4.1.12.1,,,2023-09-14
+0006595,Program nie odświeża listy projektów,zwrócony,CAD Rozkrój,normalny,CADRozkroj4.exe 4.1.12.3,,,2023-09-13
+0006908,Długi czas przełączania się między elementami na liście,zawieszony,wstawianie elementów wnętrzarskich,normalny,dodatki.dll 4.0.6.4,konwerter3d.dll 4.0.6.5,,2023-12-18
+0007264,Brak skalowania ikon w interfejsie przy wysokiej rozdzielczości ekranu i wysokim dpi,zamknięty,manager,wysoki,dodatki.dll 4.0.7.8002,manager.dll 8.0.6.8003,"ukrywacz.dll 4.0.6.8002, listwy.dll 4.0.6.8001, szafki_nowe.dll 4.0.6.8002, CADDecorPro.exe 4.0.6.8001, agd.dll 4.0.6.8002, wycena.dll 8.0.9.1, walls2.dll 4.0.6.8001, raport_wnetrz_zwykly.dll 4.0.6.8001, blaty.dll 4.0.6.8002, Walls_dll.dll 4.0.7.8001",2024-04-03
+0007249,Okna narożne i kolankowe - głębokość parapetu ulega zmianie przy edycji,zwrócony,drzwi i okna,wysoki,DoorsWindows.dll 4.0.6.58,,,2024-03-28
+0007302,Zmiany w module przy dodawaniu obsługi zapisywania bazy użytkownika do designera,rozwiązany,drzwi i okna,normalny,DoorsWindows.dll 4.0.7.1,DoorsWindows.dll 4.0.7.5,DoorsWindows.dll 4.0.7.2001,2024-04-11
+0007370,Poprawki w rzutowaniu zmiennych do bazy qmp,zamknięty,drzwi i okna,normalny,DoorsWindows.dll 4.0.8.1,DoorsWindows.dll 4.0.8.7,Doors.qmp [12.06.2024],2024-04-23
+0007500,"Po edycji ściany, znika cześć okien i drzwi w konkretnym projekcie",rozwiązany,drzwi i okna,wysoki,DoorsWindows.dll 4.0.8.11,,,2024-06-13
+0007359,Podłączenie analyticsa do modułu drzwi i okien,zamknięty,drzwi i okna,pilny,DoorsWindows.dll 4.0.8.6001,DoorsWindows.dll 4.0.8.6002,DoorsWindows.dll 4.0.8.12,2024-04-22
+0006747,Nieaktywna lista baz do pobrania przez aktualizator internetowy,zwrócony,aktualizator internetowy,pilny,IUPDATEx64.exe 9.0.0.46,,,2023-11-08
+0006903,Aktualizator zawiesza się na pobieraniu dot4cada,zawieszony,aktualizator internetowy,wysoki,iUPDATEx64.exe 9.1.0.4,,,2023-12-15
+0007410,Błąd pobierania licencji,zamknięty,aktualizator internetowy,normalny,iupdatex64.exe 9.1.0.9,,,2024-05-10
+0007020,Nie widać na rzucie dokumentacji ościeżnic wstawionych bez drzwi,zwrócony,bazy danych,normalny,kafle.dll 4.0.6.41,kafle.dll 4.0.6.42,DoorsWindows.dll 4.0.6.27,2024-01-26
+0007037,Skalowanie bloku obróconego o kąt inny niż 90 stopni nie działa prawidłowo,zwrócony,wizualizacja,normalny,kafle.dll 4.0.6.55 [21.03.2024 11:25],kafle.dll 4.0.6.58,,2024-02-06
+0007169,Próba skalowania szafki wstawionej pod kątem innym niż 90 stopni powoduje dziwne zachowanie i np. skurczenie sie szafki,zwrócony,wstawianie szafek kuchennych,wysoki,kafle.dll 4.0.6.55 [21.03.2024 11:25],kafle.dll 4.0.6.58,,2024-03-11
+0007210,Błędnie wyświetlane kontrolki do przeciągania elementów świateł na drzewku dla skali DPI 125% i wyższych,zwrócony,wizualizacja,normalny,kafle.dll 4.0.6.57,,,2024-03-19
+0007402,Brak możliwości skopiowania strony rysunek techniczny na konkretnym projekcie klienta,zawieszony,dokumentacja,pilny,kafle.dll 4.0.7.11,,,2024-05-09
+0007437,Nieoczekiwany błąd po przejściu do zestawienia płytek,zamknięty,wizualizacja,wysoki,kafle.dll 4.0.7.15,kafle.dll 4.0.8.15,kafle.dll 4.0.9.6,2024-05-20
+0007173,Rozjechanie się skali po zmianie nazwy producenta,zawieszony,konwerter,normalny,konwerter3d.dll 4.0.6.12,,,2024-03-11
+0007174,"Błąd w pogdlądzie po przeskalowaniu i przeklikiwaniu się z zakładki ""Typ"" na ""Producent""",zawieszony,konwerter,normalny,konwerter3d.dll 4.0.6.12,,,2024-03-11
+0006254,Eksport projektów - nie można anulować,zwrócony,manager,normalny,manager.dll 8.0.6.8,,,2023-07-12
+0007495,Zmiana rozmiaru okna menadżera projektów i szerokości kolumn przy zwiększonym DPI,zamknięty,manager,normalny,manager.dll 8.0.6.8004,,,2024-06-11
+0007390,Dodanie odnośników do instrukcji w menu start,zamknięty,instalator programu,wysoki,Setup.exe 2.0.0.37,iUPDATEx64.exe 9.1.0.5001,"iUPDATEx64.exe 9.1.0.5002, iUPDATEx64.exe 9.1.0.5003, iUPDATEx64.exe 9.1.0.10",2024-04-29
+0004961,brak współpracy z serwerem licencji i hasp dla wersji 64 bit,rozwiązany,szafy wnękowe,wysoki,szafy.exe 5.0.0.1 ,szafy.exe 5.0.0.2,"szafy.exe 5.0.0.1001, szafy.exe 5.0.0.1002, szafy.exe 5.0.0.1003, szafy.exe 5.0.0.1004",2022-11-30

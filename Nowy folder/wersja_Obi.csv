@@ -1,0 +1,4 @@
+﻿Identyfikator,Temat,Status,Projekt,Priorytet,Plik 1,Plik 2,Pliki inne,Data zgłoszenia
+0006948,Wycena montażu OBI,przypisany,wersja Obi,pilny,,,,2024-01-04
+0005395,Brak stosowania encji/znaków zastępczych podczas przesyłania zlecenia xml do B3,przypisany,wersja Obi,wysoki,,,,2023-02-16
+0002933,"Brak komunikatu ""Plik o podanej nazwie już istnieje. Czy chcesz go nadpisać?"" podczas zapisywania pdf w wycenie",przypisany,wersja Obi,normalny,,,,2020-12-16
