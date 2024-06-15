@@ -4,17 +4,11 @@ import time
 from tkinter import *
 from tkinter import filedialog
 
-path = "F:\\Testy"
-paths_dir = os.listdir(path)
+path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
+csv_file = None
+pack_path = None
+csv_list = []
 
-
-def get_creation_date(path, long=True):
-    time_created = time.ctime(os.path.getmtime(path))
-    t_obj = time.strptime(time_created)
-    if long == True:
-        return time.strftime("%Y-%m-%d %H:%M:%S", t_obj)
-    elif long == False:
-        return time.strftime("%d.%m.%Y", t_obj)
 
 def get_and_display_path():
     choice = var_0.get()
@@ -25,26 +19,32 @@ def get_and_display_path():
                 hotfix_cat = n
                 hotfix_path = os.path.join(path + "\\" + hotfix_cat)
         label1.config(text = f"ścieżka: {hotfix_path}")
+        pack_path = hotfix_path
+        print(pack_path)
     elif choice == 2:
         for n in paths_dir:
              if "feat" not in n and n.endswith("_op") == False and n.endswith("hotfix") == False and n != "_dok":
                 new_version_cat = n
                 new_version_path = os.path.join(path + "\\" + new_version_cat)
         label1.config(text = f"ścieżka: {new_version_path}")
+        pack_path = new_version_path
+        print(pack_path)
     
-
 def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
 def ask_for_dir(value):
-    if value == 2:
-        directory = filedialog.askdirectory()
-        label1.config(text = f"ścieżka: {directory}")
-    elif value == 1:
-        directory = filedialog.askopenfilename()
-        label0.config(text = f"ścieżka: {directory}")
-
-
+    if value == 1:
+        csv_dir = filedialog.askopenfilename()
+        label0.config(text = f"ścieżka: {csv_dir}")
+        csv_file = csv_dir
+        print(csv_file)
+    elif value == 2:
+        pack_dir = filedialog.askdirectory()
+        label1.config(text = f"ścieżka: {pack_dir}")
+        pack_path = pack_dir
+        print(pack_path)
+        
 
 gui = Tk()
 gui.geometry("300x200")
@@ -54,7 +54,6 @@ var_0 = IntVar()
 
 label0 = Label(gui)
 label0.pack()
-
 
 button0 = Button(gui, text='zmień csv', width=15, command=lambda v=1 : ask_for_dir(v))
 button0.pack( anchor = W ) 
@@ -73,15 +72,20 @@ button1.pack( anchor = W )
 
 
 list = os.listdir(get_script_path())
-csv_list = []
 
+try:
+    paths_dir = os.listdir(path)
+except:
+    FileNotFoundError
+    print('error')
 try:
     for file in list:
         if file.endswith(".csv") == True:
-            h = get_script_path() + "\\" + file
-            csv_list.append(h)
+            file_p = get_script_path() + "\\" + file
+            csv_list.append(file_p)
             csv_list.sort(key=os.path.getctime, reverse=True)
     label0.config(text = "Plik csv: " + get_script_path() + "\\" + csv_list[0])
+    csv_file = csv_list[0]
 except:
     label0.config(text = "Wybierz plik csv", bg="yellow")
 
