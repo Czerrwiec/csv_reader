@@ -15,11 +15,11 @@ kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennyc
 
 
 # laptop:
-# source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
-# csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS code workplaces\\tomasz.czerwinski.csv"
+source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test\\12.06.2024 hotfix"
+csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS code workplaces\\csv\\csv\\tomasz.czerwinski.csv"
 
-source_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\2024-05-15 4.0.8"
-csv_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski(1).csv"
+# source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test\\12.06.2024 hotfix"
+# csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS code workplaces\\csv\\csv\\tomasz.czerwinski.csv"
 
 bug_dict = {}
 
@@ -59,6 +59,7 @@ def make_path_list(folder_path):
 
 
 def sort_files_del_from_dict(filesList, dict, indexes):
+
     list_of_creation_time = []
     for x in filesList:
         list_of_creation_time.append(get_creation_date(x))
@@ -176,17 +177,6 @@ def make_add_heading(text, document):
 
 
 
-# App START:
-
-all_paths = make_path_list(source_path)
-
-indexesList = make_list_to_cut(all_paths)
-
-cuted_paths = list_paths(indexesList, all_paths)
-
-target_paths = sort_files_del_from_dict(cuted_paths, all_paths, indexesList)
-
-
 doc = OpenDocumentText()
 doc_s = doc.styles
 
@@ -226,14 +216,23 @@ paragraph_style00.addElement(ParagraphProperties(lineheight="135%"))
 doc_s.addElement(paragraph_style00)
 
 
+# App START:
+
+all_paths = make_path_list(source_path)
+
+indexesList = make_list_to_cut(all_paths)
+
+cuted_paths = list_paths(indexesList, all_paths)
+
+target_paths = sort_files_del_from_dict(cuted_paths, all_paths, indexesList)
+
+
 with open(csv_path, mode="r", encoding="utf-8") as file:
     csv_file = csv.reader(file)
     data = [tuple(row) for row in csv_file]
 
 
-
 cat_list, cat_list02, cat_list_LM, cat_list_OBI  = add_lines_to_lists(data, all_programs, kitchen_pro)
-
 
 
 #trzeba dopisać do add_lines_to_lists że jak 1 czy 2 lista jest pusta to nic się nie ma dziać dalej
