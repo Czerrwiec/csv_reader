@@ -13,18 +13,8 @@ all_programs = ['CAD', 'CAD Licencja', 'Dystrybutor baz', 'Instalator', 'Konwert
 
 kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennych', 'wycena']
 
-
-# laptop:
-# source_path = "C:\\Users\\Czerwiec\\Desktop\\Testy\\2024-05-14 4.0.7 hotfix"
-# source_path = "F:\\Testy\\2024-06-05 4.0.9_feat_10_7483 licencja"
-source_path= "F:\\Testy\\2024-05-24 4.0.7 hotfix_op"
-
-print(source_path)
-
-csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS Code work\\csv\\tomasz.czerwinski.csv"
-
-# source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test\\12.06.2024 hotfix"
-# csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS code workplaces\\csv\\csv\\tomasz.czerwinski.csv"
+source_path= "F:\Testy\\2024-06-17 4.0.9"
+csv_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski.csv"
 
 bug_dict = {}
 
@@ -96,7 +86,6 @@ def list_paths(i_list, paths):
     for index in i_list:
         pathList = list(paths.keys())
         cuted_pathList += [pathList[index]]
-    print(cuted_pathList)
     return cuted_pathList
 
 
@@ -225,9 +214,6 @@ doc_s.addElement(paragraph_style00)
 # App START:
 
 all_paths = make_path_list(source_path)
-
-for a in all_paths:
-    print(a)
 
 indexesList = make_list_to_cut(all_paths)
 

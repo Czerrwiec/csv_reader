@@ -49,9 +49,9 @@ def get_creation_date(path, long=True):
         return time.strftime("%d.%m.%Y", t_obj)
 
 
-def make_path_list(folder_path):
+def make_path_list(folder_p):
     pathName_dictionary = {}
-    for dirpath, dirnames, filenames in walk(folder_path):
+    for dirpath, dirnames, filenames in walk(folder_p):
         for file_name in filenames:
             path = os.path.abspath(os.path.join(dirpath, file_name))
             pathName_dictionary[path] = file_name
@@ -205,7 +205,7 @@ def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
 def ask_for_dir(value):
-    global pack_path
+    global folder_path
     global csv_file
     if value == 1:
         csv_dir = filedialog.askopenfilename()
@@ -215,8 +215,8 @@ def ask_for_dir(value):
     elif value == 2:
         pack_dir = filedialog.askdirectory()
         label1.config(text = f"ścieżka: {pack_dir}")
-        pack_path = pack_dir
-        print(pack_path)
+        folder_path = pack_dir
+        print(folder_path)
 
 def make_list(folder, csv_f):
 
@@ -233,9 +233,7 @@ def make_list(folder, csv_f):
         csv_file = csv.reader(file)
         data = [tuple(row) for row in csv_file]
 
-
     cat_list, cat_list02, cat_list_LM, cat_list_OBI  = add_lines_to_lists(data, all_programs, kitchen_pro)
-
 
     #trzeba dopisać do add_lines_to_lists że jak 1 czy 2 lista jest pusta to nic się nie ma dziać dalej
     make_add_heading(f"Aktualizacja z dnia {datetime.today().strftime('%d.%m.%Y')} ", doc)
@@ -252,9 +250,7 @@ def make_list(folder, csv_f):
         make_bug_dict(data, category)
         make_lines(category, bug_dict.items(), doc)
 
-
     # spróbować usunąć powtarzający się kod
-
 
     if len(cat_list02) > 0:
         make_add_paragraph("", doc)
