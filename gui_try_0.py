@@ -219,6 +219,92 @@ def make_list(folder, csv_f):
     print(folder)
     print(csv_f)
 
+    all_paths = make_path_list(folder)
+
+    indexesList = make_list_to_cut(all_paths)
+
+    cuted_paths = list_paths(indexesList, all_paths)
+
+    target_paths = sort_files_del_from_dict(cuted_paths, all_paths, indexesList)
+
+
+    with open(csv_f, mode="r", encoding="utf-8") as file:
+        csv_file = csv.reader(file)
+        data = [tuple(row) for row in csv_file]
+
+
+    cat_list, cat_list02, cat_list_LM, cat_list_OBI  = add_lines_to_lists(data, all_programs, kitchen_pro)
+
+
+    #trzeba dopisać do add_lines_to_lists że jak 1 czy 2 lista jest pusta to nic się nie ma dziać dalej
+    make_add_heading(f"Aktualizacja z dnia {datetime.today().strftime('%d.%m.%Y')} ", doc)
+    make_add_paragraph("", doc)
+
+    heading_0 = H(outlinelevel=1, stylename=heading02_style, text = "")
+    underlinedpart = Span(stylename=underline_style, text="Zmiany wspólne dla programów CAD Decor PRO i CAD Decor oraz CAD Kuchnie")
+    heading_0.addElement(underlinedpart)
+    doc.text.addElement(heading_0)
+    make_add_paragraph("", doc)
+
+
+    for category in cat_list:
+        make_bug_dict(data, category)
+        make_lines(category, bug_dict.items(), doc)
+
+
+    # spróbować usunąć powtarzający się kod
+
+
+    if len(cat_list02) > 0:
+        make_add_paragraph("", doc)
+        heading_1 = H(outlinelevel=1, stylename=heading02_style, text = "")
+        underlinedpart = Span(stylename=underline_style, text="Zmiany wspólne dla programów CAD Decor PRO oraz CAD Kuchnie")
+        heading_1.addElement(underlinedpart)
+        doc.text.addElement(heading_1)
+        make_add_paragraph("", doc)
+
+        for category in cat_list02:
+            make_bug_dict(data, category)
+            make_lines(category, bug_dict.items(), doc)
+
+
+    if len(cat_list_LM) > 0:
+        make_add_paragraph("", doc)
+        heading_2 = H(outlinelevel=1, stylename=heading02_style, text = "")
+        underlinedpart = Span(stylename=underline_style, text="Zmiany dla programu w wersji LM")
+        heading_2.addElement(underlinedpart)
+        doc.text.addElement(heading_2)
+        make_add_paragraph("", doc)
+
+        for category in cat_list_LM:
+            make_bug_dict(data, category)
+            make_lines(category, bug_dict.items(), doc)
+
+
+    if len(cat_list_OBI) > 0:
+        make_add_paragraph("", doc)
+        heading_3 = H(outlinelevel=1, stylename=heading02_style, text = "")
+        underlinedpart = Span(stylename=underline_style, text="Zmiany dla programu w wersji OBI")
+        heading_3.addElement(underlinedpart)
+        doc.text.addElement(heading_3)
+        make_add_paragraph("", doc)
+
+        for category in cat_list_OBI:
+            make_bug_dict(data, category)
+            make_lines(category, bug_dict.items(), doc)
+
+
+    make_add_paragraph("", doc)
+    make_add_paragraph("ZMIENIONE PLIKI:", doc)
+
+
+    list_of_lines = write_changed_files(target_paths)
+    sorted_list_of_lines = sorted(list_of_lines, key=str.casefold)
+
+    for line in sorted_list_of_lines:
+        doc.text.addElement(P(stylename=paragraph_style00, text = line))
+
+    save_with_current_day(doc)
 
 
 
@@ -262,8 +348,13 @@ doc_s.addElement(paragraph_style00)
 
 
 gui = Tk()
-gui.geometry("300x200")
+
+gui.geometry("500x300")
 gui.title("Generator")
+
+# frame1 = Frame(gui, highlightbackground="blue", highlightthickness=1,width=500, height=400, bd= 0)
+# frame1.pack()
+
 
 var_0 = IntVar()
 
@@ -287,6 +378,7 @@ button1.pack( anchor = W )
 
 button2 = Button(gui, text='Generuj listę', width=15, command=lambda : make_list(folder_path, csv_file))
 button2.pack( anchor = W )
+
 
 
 list = os.listdir(get_script_path())
