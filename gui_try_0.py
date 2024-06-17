@@ -12,7 +12,7 @@ from odf.opendocument import OpenDocumentText
 from odf.style import Style, TextProperties, ParagraphProperties
 from odf.text import H, P, Span
 
-path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
+path = "C:\\Users\\Czerwiec\\Desktop\\Testy"
 csv_file = None
 folder_path = None
 csv_list = []
@@ -59,21 +59,21 @@ def make_path_list(folder_path):
 
 
 def sort_files_del_from_dict(filesList, dict, indexes):
-
-    list_of_creation_time = []
-    for x in filesList:
-        list_of_creation_time.append(get_creation_date(x))
-    
-    sortedList = list_of_creation_time.index(max(list_of_creation_time))
-    list_of_indexes_to_delete = indexes[sortedList + 1 :]
-
     k_list = [k for k in dict.keys()]
+    
+    if len(filesList) > 0:
+        list_of_creation_time = []
+        for x in filesList:
+            list_of_creation_time.append(get_creation_date(x)) 
+        
+        sortedList = list_of_creation_time.index(max(list_of_creation_time))
+        list_of_indexes_to_delete = indexes[sortedList + 1 :]
 
-    for index in sorted(list_of_indexes_to_delete, reverse=True):
-        for i, name in enumerate(k_list):
-            if index == i:
-                del dict[name]
-            
+        for index in sorted(list_of_indexes_to_delete, reverse=True):
+            for i, name in enumerate(k_list):
+                if index == i:
+                    del dict[name]
+         
     for i in k_list:
         if i.endswith("txt") == True:
             del dict[i]
@@ -83,13 +83,14 @@ def sort_files_del_from_dict(filesList, dict, indexes):
 def make_list_to_cut(dict):
     indexesToCut = []
     v_list = [v for v in dict.values()]
+    
     for i, v in enumerate(dict.values()):
         if v_list.count(v) > 1 and i not in indexesToCut:
             indexesToCut.append(i)
     return indexesToCut
 
-
 def list_paths(i_list, paths):
+
     cuted_pathList = []
     k_list = [k for k in paths.keys()]
     for index in i_list:
@@ -204,6 +205,8 @@ def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
 
 def ask_for_dir(value):
+    global pack_path
+    global csv_file
     if value == 1:
         csv_dir = filedialog.askopenfilename()
         label0.config(text = f"ścieżka: {csv_dir}")
@@ -216,8 +219,6 @@ def ask_for_dir(value):
         print(pack_path)
 
 def make_list(folder, csv_f):
-    print(folder)
-    print(csv_f)
 
     all_paths = make_path_list(folder)
 
@@ -354,12 +355,29 @@ gui.title("Generator")
 
 # frame1 = Frame(gui, highlightbackground="blue", highlightthickness=1,width=500, height=400, bd= 0)
 # frame1.pack()
-
-
 var_0 = IntVar()
 
 label0 = Label(gui)
 label0.pack()
+
+list = os.listdir(get_script_path())
+
+try:
+    paths_dir = os.listdir(path)
+except:
+    FileNotFoundError
+    print('error')
+try:
+    for file in list:
+        if file.endswith(".csv") == True:
+            file_p = get_script_path() + "\\" + file
+            csv_list.append(file_p)
+            csv_list.sort(key=os.path.getctime, reverse=True)
+    label0.config(text = "Plik csv: " + get_script_path() + "\\" + csv_list[0])
+    csv_file = csv_list[0]
+except:
+    label0.config(text = "Wybierz plik csv", bg="yellow")
+
 
 button0 = Button(gui, text='zmień csv', width=15, command=lambda v=1 : ask_for_dir(v))
 button0.pack( anchor = W ) 
@@ -379,25 +397,6 @@ button1.pack( anchor = W )
 button2 = Button(gui, text='Generuj listę', width=15, command=lambda : make_list(folder_path, csv_file))
 button2.pack( anchor = W )
 
-
-
-list = os.listdir(get_script_path())
-
-try:
-    paths_dir = os.listdir(path)
-except:
-    FileNotFoundError
-    print('error')
-try:
-    for file in list:
-        if file.endswith(".csv") == True:
-            file_p = get_script_path() + "\\" + file
-            csv_list.append(file_p)
-            csv_list.sort(key=os.path.getctime, reverse=True)
-    label0.config(text = "Plik csv: " + get_script_path() + "\\" + csv_list[0])
-    csv_file = csv_list[0]
-except:
-    label0.config(text = "Wybierz plik csv", bg="yellow")
 
 gui.mainloop()
 

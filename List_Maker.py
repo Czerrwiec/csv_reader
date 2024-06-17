@@ -15,8 +15,13 @@ kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennyc
 
 
 # laptop:
-source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test\\12.06.2024 hotfix"
-csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS code workplaces\\csv\\csv\\tomasz.czerwinski.csv"
+# source_path = "C:\\Users\\Czerwiec\\Desktop\\Testy\\2024-05-14 4.0.7 hotfix"
+# source_path = "F:\\Testy\\2024-06-05 4.0.9_feat_10_7483 licencja"
+source_path= "F:\\Testy\\2024-05-24 4.0.7 hotfix_op"
+
+print(source_path)
+
+csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS Code work\\csv\\tomasz.czerwinski.csv"
 
 # source_path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test\\12.06.2024 hotfix"
 # csv_path = "C:\\Users\\Czerwiec\\Desktop\\VS code workplaces\\csv\\csv\\tomasz.czerwinski.csv"
@@ -60,18 +65,18 @@ def make_path_list(folder_path):
 
 def sort_files_del_from_dict(filesList, dict, indexes):
 
-    list_of_creation_time = []
-    for x in filesList:
-        list_of_creation_time.append(get_creation_date(x))
-    
-    sortedList = list_of_creation_time.index(max(list_of_creation_time))
-    list_of_indexes_to_delete = indexes[sortedList + 1 :]
+    if len(filesList) > 0:
+        list_of_creation_time = []
+        for x in filesList:
+            list_of_creation_time.append(get_creation_date(x))
+        
+        sortedList = list_of_creation_time.index(max(list_of_creation_time))
+        list_of_indexes_to_delete = indexes[sortedList + 1 :]
 
-    for index in sorted(list_of_indexes_to_delete, reverse=True):
-        for i, name in enumerate(list(dict.keys())):
-            if index == i:
-                del dict[name]
-            
+        for index in sorted(list_of_indexes_to_delete, reverse=True):
+            for i, name in enumerate(list(dict.keys())):
+                if index == i:
+                    del dict[name]      
     for i in list(dict.keys()):
         if i.endswith("txt") == True:
             del dict[i]
@@ -91,6 +96,7 @@ def list_paths(i_list, paths):
     for index in i_list:
         pathList = list(paths.keys())
         cuted_pathList += [pathList[index]]
+    print(cuted_pathList)
     return cuted_pathList
 
 
@@ -219,6 +225,9 @@ doc_s.addElement(paragraph_style00)
 # App START:
 
 all_paths = make_path_list(source_path)
+
+for a in all_paths:
+    print(a)
 
 indexesList = make_list_to_cut(all_paths)
 
