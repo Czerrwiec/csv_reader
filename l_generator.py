@@ -76,11 +76,11 @@ bug_dict = {}
 
 def load_data():
     global path
-    data_file = f"{get_script_path()}\\path.txt"  
+    data_file = f"{get_script_path()}\\path.txt"
     try:
         with open(data_file, "r") as f:
             for line in f:
-                path = line             
+                path = line
     except:
         FileNotFoundError
 
@@ -272,7 +272,7 @@ def get_and_display_path():
                 hotfix_path = os.path.join(path + "\\" + hotfix_cat)
         label1.configure(text=hotfix_cat)
         folder_path = hotfix_path
-        print(folder_path)
+
     elif choice == 2:
         for n in paths_dir:
             if (
@@ -285,7 +285,6 @@ def get_and_display_path():
                 new_version_path = os.path.join(path + "\\" + new_version_cat)
         label1.configure(text=new_version_cat)
         folder_path = new_version_path
-        print(folder_path)
 
 
 def get_script_path():
@@ -298,23 +297,79 @@ def ask_for_dir(value):
     if value == 1:
         csv_dir = filedialog.askopenfilename()
         if csv_dir.endswith(".csv"):
-            s_dir = csv_dir.split("/")    
+            s_dir = csv_dir.split("/")
             label0.configure(text=s_dir[-1])
             csv_file = csv_dir
         else:
-            csv_dir = ""
-            label0.configure(text="Wybierz prawidłowy plik")          
+            csv_file = ""
+            label0.configure(text="Wybierz prawidłowy plik")
 
-    elif value == 2:    
+    elif value == 2:
         pack_dir = filedialog.askdirectory()
         s_pack_dir = pack_dir.split("/")
 
         label1.configure(text=s_pack_dir[-1])
         folder_path = pack_dir
-        print(folder_path)
 
 
 def make_list(folder, csv_f):
+
+    doc = OpenDocumentText()
+    doc_s = doc.styles
+
+    heading01_style = Style(name="Heading 1", family="paragraph")
+    heading01_style.addElement(
+        TextProperties(
+            attributes={"fontsize": "16pt", "fontweight": "bold", "fontfamily": "Calibri"}
+        )
+    )
+    heading01_style.addElement(ParagraphProperties(attributes={"textalign": "center"}))
+    doc_s.addElement(heading01_style)
+
+    heading02_style = Style(name="Heading 2", family="paragraph")
+    heading02_style.addElement(
+        TextProperties(
+            attributes={"fontsize": "14pt", "fontweight": "bold", "fontfamily": "Calibri"}
+        )
+    )
+    heading02_style.addElement(ParagraphProperties(attributes={"textalign": "center"}))
+    doc_s.addElement(heading02_style)
+
+    heading03_style = Style(name="Heading 3", family="paragraph")
+    heading03_style.addElement(
+        TextProperties(
+            attributes={"fontsize": "11pt", "fontweight": "bold", "fontfamily": "Calibri"}
+        )
+    )
+    heading03_style.addElement(ParagraphProperties(lineheight="145%"))
+    doc_s.addElement(heading03_style)
+
+
+    underline_style = Style(name="Underline", family="text")
+    u_prop = TextProperties(
+        attributes={
+            "textunderlinestyle": "solid",
+            "textunderlinewidth": "auto",
+            "textunderlinecolor": "font-color",
+        }
+    )
+
+    underline_style.addElement(u_prop)
+    doc_s.addElement(underline_style)
+
+    boldstyle = Style(name="Bold", family="text")
+    boldstyle.addElement(TextProperties(attributes={"fontweight": "bold"}))
+    doc_s.addElement(boldstyle)
+
+    paragraph_style00 = Style(
+        name="paragraph",
+        family="paragraph",
+    )
+    paragraph_style00.addElement(
+        TextProperties(attributes={"fontsize": "11pt", "fontfamily": "Calibri"})
+    )
+    paragraph_style00.addElement(ParagraphProperties(lineheight="135%"))
+    doc_s.addElement(paragraph_style00)
 
     all_paths = make_path_list(folder)
 
@@ -332,7 +387,6 @@ def make_list(folder, csv_f):
         data, all_programs, kitchen_pro
     )
 
-    # trzeba dopisać do add_lines_to_lists że jak 1 czy 2 lista jest pusta to nic się nie ma dziać dalej
     make_add_heading(
         f"Aktualizacja z dnia {datetime.today().strftime('%d.%m.%Y')} ", doc
     )
@@ -350,8 +404,6 @@ def make_list(folder, csv_f):
     for category in cat_list:
         make_bug_dict(data, category)
         make_lines(category, bug_dict.items(), doc)
-
-    # spróbować usunąć powtarzający się kod
 
     if len(cat_list02) > 0:
         make_add_paragraph("", doc)
@@ -406,6 +458,7 @@ def make_list(folder, csv_f):
         doc.text.addElement(P(stylename=paragraph_style00, text=line))
 
     save_with_current_day(doc)
+
 
 
 doc = OpenDocumentText()
@@ -466,17 +519,13 @@ paragraph_style00.addElement(ParagraphProperties(lineheight="135%"))
 doc_s.addElement(paragraph_style00)
 
 
-def quit():
-    gui.quit()
-
-
 gui = CTk()
 
 gui.geometry("350x400")
 gui.title("Generator")
 gui.resizable(False, False)
 
-gui.option_add('*font', 'Helvetica -120')
+gui.option_add("*font", "Helvetica -120")
 
 var_0 = IntVar()
 
@@ -485,6 +534,13 @@ label0.pack(pady=10, anchor=CENTER)
 
 
 load_data()
+
+if path == None:
+    result = CTkMessagebox.messagebox(
+        title="Błąd!",
+        text='Dla automatycznego wykrywania paczki \n dodaj plik "path.txt" ze ścieżką.',
+        button_text="OK",
+    )
 
 list = os.listdir(get_script_path())
 
@@ -499,11 +555,12 @@ try:
             file_p = get_script_path() + "\\" + file
             csv_list.append(file_p)
             csv_list.sort(key=os.path.getctime, reverse=True)
-    label0.configure(text="Plik csv: " + csv_list[0])
+            splited_csv = csv_list[0].split("\\")
+    label0.configure(text=splited_csv[-1])
     csv_file = csv_list[0]
 except:
     label0.configure(text="Wybierz plik csv")
-    
+
 
 button0 = CTkButton(
     gui,
@@ -561,9 +618,5 @@ button2 = CTkButton(
     command=lambda: make_list(folder_path, csv_file),
 )
 button2.pack(pady=(5, 25), anchor=CENTER)
-
-if path == None:
-    result=CTkMessagebox.messagebox(title='Błąd!', text='Dla automatycznego wykrywania paczki \n dodaj plik "txt" ze ścieżką.', button_text='OK')  
-
 
 gui.mainloop()
