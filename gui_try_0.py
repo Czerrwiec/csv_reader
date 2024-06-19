@@ -4,6 +4,7 @@ import time
 from tkinter import *
 from tkinter import filedialog
 from customtkinter import *
+from CustomTkinterMessagebox import CTkMessagebox
 from os import walk
 from win32api import *
 from datetime import datetime
@@ -13,7 +14,7 @@ from odf.opendocument import OpenDocumentText
 from odf.style import Style, TextProperties, ParagraphProperties
 from odf.text import H, P, Span
 
-path = "C:\\Users\\Czerwiec\\Desktop\\setup ini test"
+path = None
 csv_file = None
 folder_path = None
 csv_list = []
@@ -71,6 +72,17 @@ kitchen_pro = [
 ]
 
 bug_dict = {}
+
+
+def load_data():
+    global path
+    data_file = f"{get_script_path()}\\path.txt"  
+    try:
+        with open(data_file, "r") as f:
+            for line in f:
+                path = line             
+    except:
+        FileNotFoundError
 
 
 def get_version_number(file_path):
@@ -258,7 +270,7 @@ def get_and_display_path():
             if n.endswith("hotfix") == True and n.endswith("_op") == False:
                 hotfix_cat = n
                 hotfix_path = os.path.join(path + "\\" + hotfix_cat)
-        label1.configure(text=f"ścieżka: {hotfix_path}")
+        label1.configure(text=hotfix_cat)
         folder_path = hotfix_path
         print(folder_path)
     elif choice == 2:
@@ -271,7 +283,7 @@ def get_and_display_path():
             ):
                 new_version_cat = n
                 new_version_path = os.path.join(path + "\\" + new_version_cat)
-        label1.configure(text=f"ścieżka: {new_version_path}")
+        label1.configure(text=new_version_cat)
         folder_path = new_version_path
         print(folder_path)
 
@@ -285,12 +297,19 @@ def ask_for_dir(value):
     global csv_file
     if value == 1:
         csv_dir = filedialog.askopenfilename()
-        label0.configure(text=f"ścieżka: {csv_dir}")
-        csv_file = csv_dir
-        print(csv_file)
-    elif value == 2:
+        if csv_dir.endswith(".csv"):
+            s_dir = csv_dir.split("/")    
+            label0.configure(text=s_dir[-1])
+            csv_file = csv_dir
+        else:
+            csv_dir = ""
+            label0.configure(text="Wybierz prawidłowy plik")          
+
+    elif value == 2:    
         pack_dir = filedialog.askdirectory()
-        label1.configure(text=f"ścieżka: {pack_dir}")
+        s_pack_dir = pack_dir.split("/")
+
+        label1.configure(text=s_pack_dir[-1])
         folder_path = pack_dir
         print(folder_path)
 
@@ -447,16 +466,25 @@ paragraph_style00.addElement(ParagraphProperties(lineheight="135%"))
 doc_s.addElement(paragraph_style00)
 
 
+def quit():
+    gui.quit()
+
+
 gui = CTk()
 
-gui.geometry("500x400")
+gui.geometry("350x400")
 gui.title("Generator")
-# gui.resizable(False, False)
+gui.resizable(False, False)
+
+gui.option_add('*font', 'Helvetica -120')
 
 var_0 = IntVar()
 
-label0 = CTkLabel(gui, height=40, font=("Consolas", 18))
+label0 = CTkLabel(gui, height=40, font=("Consolas", 14))
 label0.pack(pady=10, anchor=CENTER)
+
+
+load_data()
 
 list = os.listdir(get_script_path())
 
@@ -475,14 +503,14 @@ try:
     csv_file = csv_list[0]
 except:
     label0.configure(text="Wybierz plik csv")
-
+    
 
 button0 = CTkButton(
     gui,
-    text="Zmień csv",
+    text="Wybierz csv",
     width=160,
     height=40,
-    font=("Consolas", 18),
+    font=("Consolas", 16),
     command=lambda v=1: ask_for_dir(v),
 )
 button0.pack(pady=(5, 25), anchor=CENTER)
@@ -496,7 +524,7 @@ r_check0 = CTkRadioButton(
     text="Hotfix",
     variable=var_0,
     value=1,
-    font=("Consolas", 18),
+    font=("Consolas", 14),
     command=get_and_display_path,
 )
 r_check0.pack(pady=20, padx=(15, 5), side="left", anchor=N)
@@ -506,20 +534,20 @@ r_check1 = CTkRadioButton(
     text="Nowa wersja",
     variable=var_0,
     value=2,
-    font=("Consolas", 18),
+    font=("Consolas", 14),
     command=get_and_display_path,
 )
 r_check1.pack(pady=20, padx=(5, 15), side="left", anchor=N)
 
-label1 = CTkLabel(gui, text="", height=40, font=("Consolas", 18))
+label1 = CTkLabel(gui, text="", height=40, font=("Consolas", 14))
 label1.pack(pady=15, anchor=CENTER)
 
 button1 = CTkButton(
     gui,
-    text="Zmien paczkę",
+    text="Wybierz paczkę",
     width=160,
     height=40,
-    font=("Consolas", 18),
+    font=("Consolas", 16),
     command=lambda v=2: ask_for_dir(v),
 )
 button1.pack(pady=(5, 25), anchor=CENTER)
@@ -529,9 +557,13 @@ button2 = CTkButton(
     text="Generuj listę",
     width=160,
     height=40,
-    font=("Consolas", 18),
+    font=("Consolas", 16),
     command=lambda: make_list(folder_path, csv_file),
 )
 button2.pack(pady=(5, 25), anchor=CENTER)
+
+if path == None:
+    result=CTkMessagebox.messagebox(title='Błąd!', text='Dla automatycznego wykrywania paczki \n dodaj plik "txt" ze ścieżką.', button_text='OK')  
+
 
 gui.mainloop()
