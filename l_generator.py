@@ -62,6 +62,7 @@ all_programs = [
     "wstawianie elementów wnętrzarskich",
     "wstawianie elementów wnętrzarskich w wizualizacji",
     "zestawienie płytek, farb, fug, klejów",
+    "CAD Rozkrój"
 ]
 
 kitchen_pro = [
@@ -73,7 +74,6 @@ kitchen_pro = [
 
 bug_dict = {}
 
-
 def load_data():
     global path
     data_file = f"{get_script_path()}\\path.txt"
@@ -83,7 +83,6 @@ def load_data():
                 path = line
     except:
         FileNotFoundError
-
 
 def get_version_number(file_path):
     try:
@@ -101,7 +100,6 @@ def get_version_number(file_path):
     except:
         return "-"
 
-
 def get_creation_date(path, long=True):
     time_created = time.ctime(os.path.getmtime(path))
     t_obj = time.strptime(time_created)
@@ -110,7 +108,6 @@ def get_creation_date(path, long=True):
     elif long == False:
         return time.strftime("%d.%m.%Y", t_obj)
 
-
 def make_path_list(folder_p):
     pathName_dictionary = {}
     for dirpath, dirnames, filenames in walk(folder_p):
@@ -118,7 +115,6 @@ def make_path_list(folder_p):
             path = os.path.abspath(os.path.join(dirpath, file_name))
             pathName_dictionary[path] = file_name
     return pathName_dictionary
-
 
 def sort_files_del_from_dict(filesList, dict, indexes):
     k_list = [k for k in dict.keys()]
@@ -151,7 +147,6 @@ def make_list_to_cut(dict):
             indexesToCut.append(i)
     return indexesToCut
 
-
 def list_paths(i_list, paths):
 
     cuted_pathList = []
@@ -161,19 +156,19 @@ def list_paths(i_list, paths):
         cuted_pathList += [pathList[index]]
     return cuted_pathList
 
-
 def add_lines_to_lists(data_file, all_list, rest_list):
     cat_list_with_duplicates = []
     cat_list_with_duplicates02 = []
     cat_list_LM_with_duplicates = []
     cat_list_OBI_with_duplicates = []
+    cat_list_rozkroj_with_duplicates = []
     cat_list_OBI = []
     cat_list_LM = []
     cat_list02 = []
     cat_list = []
+    cat_list_rozkroj = []
 
     for line in data_file:
-
         if line[3].lower() == "wersja obi":
             cat_list_OBI_with_duplicates.append(line[3])
             cat_list_OBI = []
@@ -192,6 +187,15 @@ def add_lines_to_lists(data_file, all_list, rest_list):
                 if x not in cat_list_LM
             ]
 
+        elif line[3].lower() == "cad rozkrój":
+            cat_list_rozkroj_with_duplicates.append(line[3])
+            cat_list_rozkroj = []
+            [
+                cat_list_rozkroj.append(x)
+                for x in cat_list_rozkroj_with_duplicates
+                if x not in cat_list_rozkroj
+            ]
+
         elif line[3].lower() != "projekt" and line[3] in all_list:
             cat_list_with_duplicates.append(line[3])
             cat_list = []
@@ -206,8 +210,7 @@ def add_lines_to_lists(data_file, all_list, rest_list):
                 if x not in cat_list02
             ]
 
-    return cat_list, cat_list02, cat_list_LM, cat_list_OBI
-
+    return cat_list, cat_list02, cat_list_LM, cat_list_OBI, cat_list_rozkroj
 
 def make_lines(m_name, data_dict, document):
     for key, value in data_dict:
@@ -223,7 +226,6 @@ def make_lines(m_name, data_dict, document):
                 line_.addText(line[1] + "  -  " + line[2])
                 document.text.addElement(line_)
 
-
 def make_bug_dict(file, m_name):
     list_00 = []
     for line in file:
@@ -233,11 +235,9 @@ def make_bug_dict(file, m_name):
     bug_dict.update({m_name: list_00})
     return bug_dict
 
-
 def save_with_current_day(document):
     doc_name = datetime.today().strftime("%d.%m.%Y")
     document.save(f"{doc_name}.odt")
-
 
 def write_changed_files(dict_of_files):
     list_of_lines_to_write = []
@@ -250,16 +250,13 @@ def write_changed_files(dict_of_files):
         )
     return list_of_lines_to_write
 
-
 def make_add_paragraph(text, document):
     var_01 = P(stylename=paragraph_style00, text=text)
     document.text.addElement(var_01)
 
-
 def make_add_heading(text, document):
     var_01 = H(outlinelevel=1, stylename=heading01_style, text=text)
     document.text.addElement(var_01)
-
 
 def get_and_display_path():
     choice = var_0.get()
@@ -286,10 +283,8 @@ def get_and_display_path():
         label1.configure(text=new_version_cat)
         folder_path = new_version_path
 
-
 def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
-
 
 def ask_for_dir(value):
     global folder_path
@@ -383,27 +378,29 @@ def make_list(folder, csv_f):
         csv_file = csv.reader(file)
         data = [tuple(row) for row in csv_file]
 
-    cat_list, cat_list02, cat_list_LM, cat_list_OBI = add_lines_to_lists(
+    cat_list, cat_list02, cat_list_LM, cat_list_OBI, cat_list_rozkroj = add_lines_to_lists(
         data, all_programs, kitchen_pro
     )
+
 
     make_add_heading(
         f"Aktualizacja z dnia {datetime.today().strftime('%d.%m.%Y')} ", doc
     )
     make_add_paragraph("", doc)
 
-    heading_0 = H(outlinelevel=1, stylename=heading02_style, text="")
-    underlinedpart = Span(
-        stylename=underline_style,
-        text="Zmiany wspólne dla programów CAD Decor PRO i CAD Decor oraz CAD Kuchnie",
-    )
-    heading_0.addElement(underlinedpart)
-    doc.text.addElement(heading_0)
-    make_add_paragraph("", doc)
+    if len(cat_list) > 0:
+        heading_0 = H(outlinelevel=1, stylename=heading02_style, text="")
+        underlinedpart = Span(
+            stylename=underline_style,
+            text="Zmiany wspólne dla programów CAD Decor PRO i CAD Decor oraz CAD Kuchnie",
+        )
+        heading_0.addElement(underlinedpart)
+        doc.text.addElement(heading_0)
+        make_add_paragraph("", doc)
 
-    for category in cat_list:
-        make_bug_dict(data, category)
-        make_lines(category, bug_dict.items(), doc)
+        for category in cat_list:
+            make_bug_dict(data, category)
+            make_lines(category, bug_dict.items(), doc)
 
     if len(cat_list02) > 0:
         make_add_paragraph("", doc)
@@ -448,6 +445,20 @@ def make_list(folder, csv_f):
             make_bug_dict(data, category)
             make_lines(category, bug_dict.items(), doc)
 
+
+    if len(cat_list_rozkroj) > 0:
+        make_add_paragraph("", doc)
+        heading_4 = H(outlinelevel=1, stylename=heading02_style, text="")
+        underlinedpart=Span(stylename=underline_style, text="Zmiany dla programu CAD Rozkrój")
+        heading_4.addElement(underlinedpart)
+        doc.text.addElement(heading_4)
+        make_add_paragraph("", doc)
+
+        for category in cat_list_rozkroj:
+            make_bug_dict(data, category)
+            make_lines(category, bug_dict.items(), doc)
+    
+
     make_add_paragraph("", doc)
     make_add_paragraph("ZMIENIONE PLIKI:", doc)
 
@@ -458,8 +469,6 @@ def make_list(folder, csv_f):
         doc.text.addElement(P(stylename=paragraph_style00, text=line))
 
     save_with_current_day(doc)
-
-
 
 doc = OpenDocumentText()
 doc_s = doc.styles
