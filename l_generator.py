@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import time
 from tkinter import *
@@ -14,10 +15,13 @@ from odf.opendocument import OpenDocumentText
 from odf.style import Style, TextProperties, ParagraphProperties
 from odf.text import H, P, Span
 
+
+
 path = None
 csv_file = None
 folder_path = None
 csv_list = []
+
 
 all_programs = [
     "CAD",
@@ -137,7 +141,6 @@ def sort_files_del_from_dict(filesList, dict, indexes):
             del dict[i]
     return dict
 
-
 def make_list_to_cut(dict):
     indexesToCut = []
     v_list = [v for v in dict.values()]
@@ -237,7 +240,8 @@ def make_bug_dict(file, m_name):
 
 def save_with_current_day(document):
     doc_name = datetime.today().strftime("%d.%m.%Y")
-    document.save(f"{doc_name}.odt")
+    file = os.path.join(get_script_path(), doc_name + ".odt")
+    document.save(file)
 
 def write_changed_files(dict_of_files):
     list_of_lines_to_write = []
@@ -269,6 +273,7 @@ def get_and_display_path():
                 hotfix_path = os.path.join(path + "\\" + hotfix_cat)
         label1.configure(text=hotfix_cat)
         folder_path = hotfix_path
+        button3.configure(state="normal")
 
     elif choice == 2:
         for n in paths_dir:
@@ -282,6 +287,7 @@ def get_and_display_path():
                 new_version_path = os.path.join(path + "\\" + new_version_cat)
         label1.configure(text=new_version_cat)
         folder_path = new_version_path
+        button3.configure(state="normal")
 
 def get_script_path():
     return os.path.dirname(os.path.realpath(sys.argv[0]))
@@ -305,7 +311,7 @@ def ask_for_dir(value):
 
         label1.configure(text=s_pack_dir[-1])
         folder_path = pack_dir
-
+        button3.configure(state="normal")
 
 def make_list(folder, csv_f):
 
@@ -373,6 +379,7 @@ def make_list(folder, csv_f):
     cuted_paths = list_paths(indexesList, all_paths)
 
     target_paths = sort_files_del_from_dict(cuted_paths, all_paths, indexesList)
+
 
     with open(csv_f, mode="r", encoding="utf-8") as file:
         csv_file = csv.reader(file)
@@ -470,6 +477,125 @@ def make_list(folder, csv_f):
 
     save_with_current_day(doc)
 
+def copy_pack(folder): 
+    global a_dirs_to_delete
+    a_dirs_to_delete = []
+    
+    try:
+        new_dir = get_script_path() + "/" + datetime.today().strftime("%d-%m-%Y") + " x64"
+        shutil.copytree(folder, new_dir)
+    except: 
+        FileExistsError
+        new_dir = get_script_path() + "/" + datetime.today().strftime("%d-%m-%Y") + " x64(1)"
+        shutil.copytree(folder, new_dir)
+
+    directory_list =  make_path_list(new_dir)
+
+    for item in directory_list:
+        if item.endswith(".txt"):
+            os.remove(item)
+    
+    i_list = make_list_to_cut(directory_list)
+
+    if len(i_list) > 0:
+        cuted_p = list_paths(i_list, directory_list)
+        t_paths = sort_files_del_from_dict(cuted_p, directory_list, i_list)
+        del_files_and_dirs(new_dir, t_paths)
+        
+    move_odt_file(new_dir)
+    
+
+def del_files_and_dirs(dir, paths):
+
+    for p in make_path_list(dir):
+        dir_to_remove = []
+        dir_to_remove_02 = []
+
+        if p not in paths:
+            dir_to_remove.append(os.path.dirname(p))
+            os.remove(p)
+        
+        for i in dir_to_remove:
+            dir_to_remove_02.append(os.path.dirname(i))
+            os.rmdir(i)
+        
+        for p in dir_to_remove_02:
+            if p not in a_dirs_to_delete:
+                a_dirs_to_delete.append(p)
+
+    for i in a_dirs_to_delete:
+        shutil.rmtree(i)
+
+def move_odt_file(new_dir):
+    dir = os.listdir(get_script_path())
+    odt_list = []
+    try:
+        for file in dir:
+            if file.endswith(".odt") == True:
+                file_p = get_script_path() + "\\" + file
+                odt_list.append(file_p)
+                odt_list.sort(key=os.path.getctime, reverse=True)
+                shutil.move(odt_list[0], new_dir)
+    except:
+        print("error")
+
+def move_csv_files():
+    file_p = ''
+    files_list = []
+    data_file = f"{get_script_path()}\\csv_path.txt"
+    csv_list02 = []
+    try:
+        with open(data_file, "r") as f:
+            for line in f:
+                file_p = line
+                print(file_p)
+    except:
+        FileNotFoundError
+    
+    try:
+        files_list = os.listdir(file_p)
+    except:
+        FileNotFoundError
+
+
+    if len(files_list) > 0:
+        try:
+            for item in files_list:
+                if item.endswith(".csv") == True:
+                    print(item)
+                    file = file_p + "\\" + item
+                    print(file)
+                    csv_list02.append(file)
+                    csv_list02.sort(key=os.path.getctime, reverse=True)
+            shutil.move(csv_list02[0], get_script_path())
+        except:
+            print("error in move csv")
+    
+    get_default_csv()
+
+
+def get_default_csv():
+    global csv_file
+    list = os.listdir(get_script_path())
+    try:
+        paths_dir = os.listdir(path)
+    except:
+        FileNotFoundError
+        print("error in get default csv")
+    try:
+        for file in list:
+            if file.endswith(".csv") == True:
+                file_p = get_script_path() + "\\" + file
+                csv_list.append(file_p)
+                csv_list.sort(key=os.path.getctime, reverse=True)
+                splited_csv = csv_list[0].split("\\")
+        label0.configure(text=splited_csv[-1]) 
+        csv_file = csv_list[0]
+    except:
+        label0.configure(text="Wybierz plik csv")
+    return csv_file, paths_dir
+
+
 doc = OpenDocumentText()
 doc_s = doc.styles
 
@@ -530,16 +656,27 @@ doc_s.addElement(paragraph_style00)
 
 gui = CTk()
 
-gui.geometry("350x400")
+gui.geometry("350x500")
 gui.title("Generator")
 gui.resizable(False, False)
 
-gui.option_add("*font", "Helvetica -120")
+gui.eval('tk::PlaceWindow . center')
 
 var_0 = IntVar()
 
-label0 = CTkLabel(gui, height=40, font=("Consolas", 14))
-label0.pack(pady=10, anchor=CENTER)
+button00 = CTkButton(
+    gui,
+    text="*",
+    width=20,
+    height=8,
+    font=("Consolas", 14),
+    command=move_csv_files
+)
+button00.pack(pady=(10, 0), padx=(10,0), anchor=W)
+button00.configure(border_width=1)
+
+label0 = CTkLabel(gui, height=20, font=("Consolas", 14))
+label0.pack(pady=(0,10), anchor=CENTER)
 
 
 load_data()
@@ -551,25 +688,7 @@ if path == None:
         button_text="OK",
     )
 
-list = os.listdir(get_script_path())
-
-try:
-    paths_dir = os.listdir(path)
-except:
-    FileNotFoundError
-    print("error")
-try:
-    for file in list:
-        if file.endswith(".csv") == True:
-            file_p = get_script_path() + "\\" + file
-            csv_list.append(file_p)
-            csv_list.sort(key=os.path.getctime, reverse=True)
-            splited_csv = csv_list[0].split("\\")
-    label0.configure(text=splited_csv[-1])
-    csv_file = csv_list[0]
-except:
-    label0.configure(text="Wybierz plik csv")
-
+csv_file, paths_dir = get_default_csv()
 
 button0 = CTkButton(
     gui,
@@ -628,4 +747,16 @@ button2 = CTkButton(
 )
 button2.pack(pady=(5, 25), anchor=CENTER)
 
+button3 = CTkButton(
+    gui,
+    text="Utwórz paczkę",
+    width=160,
+    height=40,
+    font=("Consolas", 16),
+    command=lambda: copy_pack(folder_path)
+)
+button3.pack(pady=(5, 25), anchor=CENTER)
+button3.configure(state="disabled", hover=True, border_width=1, border_color="gold")
+
 gui.mainloop()
+
