@@ -13,8 +13,8 @@ all_programs = ['CAD', 'CAD Licencja', 'Dystrybutor baz', 'Instalator', 'Konwert
 
 kitchen_pro = ['blaty','wstawianie elementów agd', 'wstawianie szafek kuchennych', 'wycena']
 
-source_path= "F:\Testy\\2024-06-17 4.0.9"
-csv_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski.csv"
+source_path= "C:\\Users\\Czerwiec\\Desktop\\Testy\\2024-06-17 4.0.9"
+csv_path = "C:\\Users\\Czerwiec\\Desktop\\test_folder\\csv\\tomasz.czerwinski(1).csv"
 
 bug_dict = {}
 
@@ -53,24 +53,38 @@ def make_path_list(folder_path):
     return pathName_dictionary
 
 
-def sort_files_del_from_dict(filesList, dict, indexes):
 
-    if len(filesList) > 0:
-        list_of_creation_time = []
-        for x in filesList:
-            list_of_creation_time.append(get_creation_date(x))
-        
-        sortedList = list_of_creation_time.index(max(list_of_creation_time))
-        list_of_indexes_to_delete = indexes[sortedList + 1 :]
+def sort_files_del_from_dict(file_list, bug_d, indexes):
+    list_of_names = []
+    list_without_duplicates = []
 
-        for index in sorted(list_of_indexes_to_delete, reverse=True):
-            for i, name in enumerate(list(dict.keys())):
-                if index == i:
-                    del dict[name]      
-    for i in list(dict.keys()):
-        if i.endswith("txt") == True:
-            del dict[i]
-    return dict
+    for i in file_list:
+        list_of_names.append(os.path.basename(i))
+
+    [list_without_duplicates.append(x) for x in list_of_names if x not in list_without_duplicates]
+
+    for n in range(len(list_without_duplicates)):
+        condition = lambda x: os.path.basename(x) == list_without_duplicates[n]
+
+        filtered_list = [x for x in file_list if condition(x)]
+        time_list = []
+
+        for item in filtered_list:
+            time_list.append(os.path.getmtime(item))
+            x = time_list.index(max(time_list))
+
+        del filtered_list[x]
+
+        for a in filtered_list:
+            del bug_d[a]
+
+    listed_dict = [x for x in bug_d.keys()]
+
+    for x in listed_dict:
+        if x.endswith(".txt"):
+            del bug_d[x]
+
+    return bug_d
 
 
 def make_list_to_cut(dict):

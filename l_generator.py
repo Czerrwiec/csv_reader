@@ -16,12 +16,10 @@ from odf.style import Style, TextProperties, ParagraphProperties
 from odf.text import H, P, Span
 
 
-
 path = None
 csv_file = None
 folder_path = None
 csv_list = []
-
 
 all_programs = [
     "CAD",
@@ -120,26 +118,39 @@ def make_path_list(folder_p):
             pathName_dictionary[path] = file_name
     return pathName_dictionary
 
-def sort_files_del_from_dict(filesList, dict, indexes):
-    k_list = [k for k in dict.keys()]
 
-    if len(filesList) > 0:
-        list_of_creation_time = []
-        for x in filesList:
-            list_of_creation_time.append(get_creation_date(x))
 
-        sortedList = list_of_creation_time.index(max(list_of_creation_time))
-        list_of_indexes_to_delete = indexes[sortedList + 1 :]
+def sort_files_del_from_dict(file_list, bug_d):
+    list_of_names = []
+    list_without_duplicates = []
 
-        for index in sorted(list_of_indexes_to_delete, reverse=True):
-            for i, name in enumerate(k_list):
-                if index == i:
-                    del dict[name]
+    for i in file_list:
+        list_of_names.append(os.path.basename(i))
 
-    for i in k_list:
-        if i.endswith("txt") == True:
-            del dict[i]
-    return dict
+    [list_without_duplicates.append(x) for x in list_of_names if x not in list_without_duplicates]
+
+    for n in range(len(list_without_duplicates)):
+        condition = lambda x: os.path.basename(x) == list_without_duplicates[n]
+
+        filtered_list = [x for x in file_list if condition(x)]
+        time_list = []
+
+        for item in filtered_list:
+            time_list.append(os.path.getmtime(item))
+            x = time_list.index(max(time_list))
+
+        del filtered_list[x]
+
+        for a in filtered_list:
+            del bug_d[a]
+
+    listed_dict = [x for x in bug_d.keys()]
+
+    for x in listed_dict:
+        if x.endswith(".txt"):
+            del bug_d[x]
+
+    return bug_d
 
 def make_list_to_cut(dict):
     indexesToCut = []
@@ -378,7 +389,7 @@ def make_list(folder, csv_f):
 
     cuted_paths = list_paths(indexesList, all_paths)
 
-    target_paths = sort_files_del_from_dict(cuted_paths, all_paths, indexesList)
+    target_paths = sort_files_del_from_dict(cuted_paths, all_paths)
 
 
     with open(csv_f, mode="r", encoding="utf-8") as file:
@@ -491,15 +502,13 @@ def copy_pack(folder):
 
     directory_list =  make_path_list(new_dir)
 
-    for item in directory_list:
-        if item.endswith(".txt"):
-            os.remove(item)
-    
     i_list = make_list_to_cut(directory_list)
 
     if len(i_list) > 0:
         cuted_p = list_paths(i_list, directory_list)
-        t_paths = sort_files_del_from_dict(cuted_p, directory_list, i_list)
+       
+        t_paths = sort_files_del_from_dict(cuted_p, directory_list)
+
         del_files_and_dirs(new_dir, t_paths)
         
     move_odt_file(new_dir)
@@ -512,14 +521,16 @@ def del_files_and_dirs(dir, paths):
         dir_to_remove_02 = []
 
         if p not in paths:
-            dir_to_remove.append(os.path.dirname(p))
             os.remove(p)
-        
+            if p.endswith('.txt') == False:
+                dir_to_remove.append(os.path.dirname(p))
+           
         for i in dir_to_remove:
             dir_to_remove_02.append(os.path.dirname(i))
             os.rmdir(i)
         
         for p in dir_to_remove_02:
+            
             if p not in a_dirs_to_delete:
                 a_dirs_to_delete.append(p)
 
@@ -534,7 +545,7 @@ def move_odt_file(new_dir):
             if file.endswith(".odt") == True:
                 file_p = get_script_path() + "\\" + file
                 odt_list.append(file_p)
-                odt_list.sort(key=os.path.getctime, reverse=True)
+                odt_list.sort(key=os.path.getmtime, reverse=True)
                 shutil.move(odt_list[0], new_dir)
     except:
         print("error")
@@ -548,7 +559,6 @@ def move_csv_files():
         with open(data_file, "r") as f:
             for line in f:
                 file_p = line
-                print(file_p)
     except:
         FileNotFoundError
     
@@ -562,11 +572,9 @@ def move_csv_files():
         try:
             for item in files_list:
                 if item.endswith(".csv") == True:
-                    print(item)
                     file = file_p + "\\" + item
-                    print(file)
                     csv_list02.append(file)
-                    csv_list02.sort(key=os.path.getctime, reverse=True)
+                    csv_list02.sort(key=os.path.getmtime, reverse=True)
             shutil.move(csv_list02[0], get_script_path())
         except:
             print("error in move csv")
@@ -587,7 +595,7 @@ def get_default_csv():
             if file.endswith(".csv") == True:
                 file_p = get_script_path() + "\\" + file
                 csv_list.append(file_p)
-                csv_list.sort(key=os.path.getctime, reverse=True)
+                csv_list.sort(key=os.path.getmtime, reverse=True)
                 splited_csv = csv_list[0].split("\\")
         label0.configure(text=splited_csv[-1]) 
         csv_file = csv_list[0]
