@@ -292,6 +292,8 @@ def get_and_display_path():
                 "feat" not in n
                 and n.endswith("_op") == False
                 and n.endswith("hotfix") == False
+                and n.endswith('.odt') == False
+                and n.endswith('.txt') == False
                 and n != "_dok"
             ):
                 new_version_cat = n
@@ -493,11 +495,11 @@ def copy_pack(folder):
     a_dirs_to_delete = []
     
     try:
-        new_dir = get_script_path() + "/" + datetime.today().strftime("%d-%m-%Y") + " x64"
+        new_dir = get_script_path() + "/" + datetime.today().strftime("%Y-%m-%d") + " x64"
         shutil.copytree(folder, new_dir)
     except: 
         FileExistsError
-        new_dir = get_script_path() + "/" + datetime.today().strftime("%d-%m-%Y") + " x64(1)"
+        new_dir = get_script_path() + "/" + datetime.today().strftime("%Y-%m-%d") + " x64(1)"
         shutil.copytree(folder, new_dir)
 
     directory_list =  make_path_list(new_dir)
@@ -696,7 +698,10 @@ if path == None:
         button_text="OK",
     )
 
-csv_file, paths_dir = get_default_csv()
+try:
+    csv_file, paths_dir = get_default_csv()
+except:
+    UnboundLocalError
 
 button0 = CTkButton(
     gui,
