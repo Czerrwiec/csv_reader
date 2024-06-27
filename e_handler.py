@@ -5,6 +5,7 @@ import json
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from win32api import *
 
 
 odt_name = date.today().strftime("%d.%m.%Y") + ".odt"
@@ -86,19 +87,42 @@ def send_email():
             sender_email, emails, message.as_string()
         )
 
+def get_user():
+    print(var_0.get())
+
+def get_receivers():
+    print(var_1.get())
+
+def get_version_number(file_path):
+    try:
+        File_information = GetFileVersionInfo(file_path, "\\")
+        ms_file_version = File_information["FileVersionMS"]
+        ls_file_version = File_information["FileVersionLS"]
+
+        list_of_versions = [
+            str(HIWORD(ms_file_version)),
+            str(LOWORD(ms_file_version)),
+            str(HIWORD(ls_file_version)),
+            str(LOWORD(ls_file_version)),
+        ]
+        return ".".join(list_of_versions)
+    except:
+        return "-"
+
+
 app = CTk()
 
 app.title("email sender")
 app.geometry("380x400")
 app.eval('tk::PlaceWindow . center')
 
-f = open('//home//czerwiec//Pulpit//VS Code workplaces//csv_reader//data.json')
-data = json.load(f)
+var_0 = IntVar()
+var_1 = IntVar()
 
-
-print(data["users"][0])
-
-print(data["users"][0]["displayname"])
+# f = open('//home//czerwiec//Pulpit//VS Code workplaces//csv_reader//data.json')
+# data = json.load(f)
+# print(data["users"][0])
+# print(data["users"][0]["displayname"])
 
 if os.path.isfile(pack_path + "\\" + odt_name):
     odt_file = pack_path + "\\" + odt_name
@@ -113,19 +137,17 @@ e_button01 = CTkButton(app, text="Dodaj listę", width=160, height=40, font=("Co
 e_button01.pack(padx=(0,0), pady=(15,20), anchor=CENTER)
 
 
-print(os.path.isfile(pack_path + "\\" + "MainFiles\\V4_I10x64\\kafle.dll"))
-
 e_frame = CTkFrame(app)
 e_frame.configure(border_width=2, fg_color="transparent")
 e_frame.pack()
 
 
-e_radiobutton01 = CTkRadioButton(e_frame, text="Kinga", font=("Consolas", 14))
+e_radiobutton01 = CTkRadioButton(e_frame, text="Kinga", variable=var_0, value=1, font=("Consolas", 14), command=get_user)
 e_radiobutton01.pack(pady=20, padx=(30, 5), side="left", anchor=N)
 if is_file == False:
     e_radiobutton01.configure(state="disabled")
 
-e_radiobutton02 = CTkRadioButton(e_frame, text="Tomasz", font=("Consolas", 14))
+e_radiobutton02 = CTkRadioButton(e_frame, text="Tomasz", variable=var_0, value=2, font=("Consolas", 14), command=get_user)
 e_radiobutton02.pack(pady=20, padx=(5, 15), side="left", anchor=N)
 if is_file == False:
     e_radiobutton02.configure(state="disabled")
@@ -135,20 +157,27 @@ e_frame02 = CTkFrame(app)
 e_frame02.configure(border_width=2, fg_color="transparent")
 e_frame02.pack(pady=(20,0), padx=(0,0))
 
-e_radiobutton03 = CTkRadioButton(e_frame02, text="Serwis", font=("Consolas", 14))
+e_radiobutton03 = CTkRadioButton(e_frame02, text="Serwis", variable=var_1, value=1, font=("Consolas", 14), command=get_receivers)
 e_radiobutton03.pack(pady=20, padx=(30, 5), side="left", anchor=N)
 if is_file == False:
     e_radiobutton03.configure(state="disabled")
 
-e_radiobutton04 = CTkRadioButton(e_frame02, text="Wszyscy", font=("Consolas", 14))
+e_radiobutton04 = CTkRadioButton(e_frame02, text="Wszyscy", variable=var_1, value=2, font=("Consolas", 14), command=get_receivers)
 e_radiobutton04.pack(pady=20, padx=(5, 15), side="left", anchor=N)
 if is_file == False:
     e_radiobutton04.configure(state="disabled")
 
-label02 = CTkLabel(app, text="Wersja programu: ", fg_color="transparent", font=("Consolas", 14))
+
+x = pack_path + "\\" + "MainFiles\\V4_I10x64\\kafle.dll"
+
+if os.path.isfile(x):
+    label02 = CTkLabel(app, text="Wersja programu: " + get_version_number(x), fg_color="transparent", font=("Consolas", 14))
+else:
+    label02 = CTkLabel(app, text="Wersja programu: " + "bez zmian.", fg_color="transparent", font=("Consolas", 14))
+
 label02.pack(padx=(0,0), pady=(15,0), anchor=CENTER)
 
-e_button02 = CTkButton(app, text="Wyślij email", width=160, height=40, font=("Consolas", 14), command=send_email())
+e_button02 = CTkButton(app, text="Wyślij email", width=160, height=40, font=("Consolas", 14), command=send_email)
 e_button02.pack(padx=(0,0), pady=(20,20), anchor=CENTER)
 if is_file == False:
     e_button02.configure(state="disabled")
