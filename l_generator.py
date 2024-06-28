@@ -9,11 +9,17 @@ from CustomTkinterMessagebox import CTkMessagebox
 from os import walk
 from win32api import *
 from datetime import datetime
+from datetime import date
 import time
 import csv
+import json
+import smtplib, ssl
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 from odf.opendocument import OpenDocumentText
-from odf.style import Style, TextProperties, ParagraphProperties
+from odf.style import Style, TextProperties, ParagraphProperties, TabStop, TabStops
 from odf.text import H, P, Span
+from odf import teletype
 
 
 path = None
@@ -100,7 +106,7 @@ def get_version_number(file_path):
         ]
         return ".".join(list_of_versions)
     except:
-        return "-"
+        return " "
 
 def get_creation_date(path, long=True):
     time_created = time.ctime(os.path.getmtime(path))
@@ -117,8 +123,6 @@ def make_path_list(folder_p):
             path = os.path.abspath(os.path.join(dirpath, file_name))
             pathName_dictionary[path] = file_name
     return pathName_dictionary
-
-
 
 def sort_files_del_from_dict(file_list, bug_d):
     list_of_names = []
@@ -234,12 +238,13 @@ def make_lines(m_name, data_dict, document):
             document.text.addElement(headline)
 
             for line in value:
-                line_ = P(stylename=paragraph_style00, text="")
+                line_ = P(stylename=tabparagraphstyle01)
                 boldpart = Span(stylename=boldstyle, text=line[0])
                 line_.addElement(boldpart)
-                line_.addText(line[1] + "  -  " + line[2])
+                text = f"\t{line[2]}"
+                teletype.addTextToElement(line_, text)
                 document.text.addElement(line_)
-
+             
 def make_bug_dict(file, m_name):
     list_00 = []
     for line in file:
@@ -261,7 +266,7 @@ def write_changed_files(dict_of_files):
         file_version = get_version_number(key)
         file_name = value
         list_of_lines_to_write.append(
-            f"{file_name} {file_version} {file_creation_date}"
+            f"{file_name} {file_version}\t{file_creation_date}"
         )
     return list_of_lines_to_write
 
@@ -385,6 +390,31 @@ def make_list(folder, csv_f):
     paragraph_style00.addElement(ParagraphProperties(lineheight="135%"))
     doc_s.addElement(paragraph_style00)
 
+    tabstops_style = TabStops()
+    tabstop_style = TabStop(position="5cm")
+    tabstops_style.addElement(tabstop_style)
+    tabstoppar = ParagraphProperties()
+    tabstoppar.addElement(tabstops_style)
+    tabparagraphstyle = Style(name="Question", family="paragraph")
+    tabparagraphstyle.addElement(
+        TextProperties(attributes={"fontsize": "11pt", "fontfamily": "Calibri"})
+    )
+    tabparagraphstyle.addElement(ParagraphProperties(lineheight="135%")) 
+    tabparagraphstyle.addElement(tabstoppar)
+    doc_s.addElement(tabparagraphstyle)
+
+    tabstop_style01 = TabStop(position="1.2cm")
+    tabstops_style.addElement(tabstop_style01)
+    tabstoppar01 = ParagraphProperties()
+    tabstoppar01.addElement(tabstops_style)
+    tabparagraphstyle01 = Style(name="Question", family="paragraph")
+    tabparagraphstyle01.addElement(
+            TextProperties(attributes={"fontsize": "11pt", "fontfamily": "Calibri"})
+        )
+    tabparagraphstyle01.addElement(ParagraphProperties(lineheight="135%"))
+    tabparagraphstyle01.addElement(tabstoppar01)
+    doc_s.addElement(tabparagraphstyle01)
+
     all_paths = make_path_list(folder)
 
     indexesList = make_list_to_cut(all_paths)
@@ -486,14 +516,17 @@ def make_list(folder, csv_f):
     sorted_list_of_lines = sorted(list_of_lines, key=str.casefold)
 
     for line in sorted_list_of_lines:
-        doc.text.addElement(P(stylename=paragraph_style00, text=line))
+        tabp = P(stylename=tabparagraphstyle)
+        teletype.addTextToElement(tabp, line)
+        doc.text.addElement(tabp)
 
     save_with_current_day(doc)
 
 def copy_pack(folder): 
     global a_dirs_to_delete
     a_dirs_to_delete = []
-    
+    global new_dir
+
     try:
         new_dir = get_script_path() + "/" + datetime.today().strftime("%Y-%m-%d") + " x64"
         shutil.copytree(folder, new_dir)
@@ -515,7 +548,8 @@ def copy_pack(folder):
         
     move_odt_file(new_dir)
     
-
+    button4.configure(state="normal", hover=True)
+    
 def del_files_and_dirs(dir, paths):
 
     for p in make_path_list(dir):
@@ -537,7 +571,7 @@ def del_files_and_dirs(dir, paths):
                 a_dirs_to_delete.append(p)
 
     for i in a_dirs_to_delete:
-        shutil.rmtree(i)
+        shutil.rmtree(i)     
 
 def move_odt_file(new_dir):
     dir = os.listdir(get_script_path())
@@ -583,7 +617,6 @@ def move_csv_files():
     
     get_default_csv()
 
-
 def get_default_csv():
     global csv_file
     list = os.listdir(get_script_path())
@@ -604,6 +637,231 @@ def get_default_csv():
     except:
         label0.configure(text="Wybierz plik csv")
     return csv_file, paths_dir
+
+def send_email(user, email_receiver, kafle):
+    print(user)
+    print(email_receiver)
+
+    f = open(get_script_path() + "\\" + "users.json", encoding='utf-8')
+    data = json.load(f)
+
+    if user == 1:
+        user = data["users"][1]["displayname"]
+    elif user == 2:
+        user = data["users"][0]["displayname"]
+
+    if email_receiver == 1:
+        email_receiver = data["receivers"][0]["emails"]
+    elif email_receiver == 2:
+        email_receiver = data["receivers"][1]["emails"]
+
+    print("")
+    print(user)
+    print(email_receiver)
+
+    sender_email = "tomasz.czerwinski@cadprojekt.com.pl"
+    emails = ["tomasz.czerwinski@cadprojekt.com.pl"]
+    password = "tomczer23"
+
+    message = MIMEMultipart("multipart")
+    # message = MIMEMultipart("alternative")
+    message["Subject"] = f"Aktualizacja z dnia {date.today().strftime("%d.%m.%Y")}"
+    message["From"] = sender_email
+    message["To"] = ', '.join(emails)
+
+    text = data["messeges"][0]["data"]
+
+    # text = "Myszowy test majla grupowego."
+
+    print(kafle)
+    print(text)
+
+
+    footer_tomasz = """\
+
+    <html>
+        <head>
+            <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+        </head>
+        <body style="margin: 0; padding: 20px;">
+        <div style="font: normal normal normal 12px/14px Helvetica; color: #000; padding: 5px 0;">Pozdrawiam / Kind regards</div>
+            <div style="padding: 10px 0;">
+                <div style="display: flex; flex-wrap: wrap; align-items: center; margin: 0 -20px;">
+                    <div style="width: 340px;">
+                        <div style="padding: 0 20px">						
+                            <div style="font: normal normal bold 20px/24px Helvetica; color: #000; padding: 5px 0;">Tomasz Czerwiński</div>
+                            <div style="font: normal normal normal 14px/16px Helvetica; color: #000;">Junior Software Tester</span></div>
+                        </div>
+                    </div>
+                    <div style="width: 330px;display: flex;align-items: center;align-self: stretch;height: 56px;border-left: 1px solid #000;margin-left: -1px;">
+                        <div style="padding-left: 20px;">
+                                <a style="display: block; text-decoration: none; font: normal normal normal 11px/12px Helvetica; color: #000; padding-top: 5px;" href="mailto:tomasz.czerwinski@cadprojekt.com.pl">tomasz.czerwinski@cadprojekt.com.pl</a>
+                            <a style="display: block; text-decoration: none; font: normal normal normal 11px/12px Helvetica; color: #000; padding-top: 5px;" href="mailto:testy@cadprojekt.com.pl">testy@cadprojekt.com.pl</a>
+                        </div>
+                    </div>
+                    <div style="padding: 0 20px; align-self: flex-end;">
+                        <img style="height: 24px; width: auto; display: block; margin-top: 10px;" src="https://cadprojekt.com.pl/zasoby/email/logo_spjawna.png" alt="CAD PROJEKT">
+                    </div>
+                </div>
+            </div>
+            <div style="font: normal normal normal 10px/14px Helvetica; color: #666; padding: 10px 0; width: 815px; max-width: 100%; border-top: 3px solid #F3951A;">
+                CAD Projekt K&A Sp.j. Dąbrowski, Sterczała, Sławek  | Poznański Park Naukowo-Technologiczny <br>
+                ul. Rubież 46 | 61-612 Poznań | Poland | NIP 779-00-34-266 | REGON 632223660 | <a style="text-decoration: none; color: #666" href="https://www.cadprojekt.com.pl">www.cadprojekt.com.pl</a> 
+            </div>
+        
+            <a style="display: block; font: normal normal normal 10px/14px Helvetica; color: #666; padding: 10px 0; text-decoration: none;" href="https://cadprojekt.com.pl/polityka-prywatnosci-sp-j" target="_blank">
+                Zapoznaj się z zasadami przetwarzania Twoich danych osobowych.
+            </a>
+        </body>
+    </html>
+
+    """
+
+    footer_kinga = """  
+
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    </head>
+    <body style="margin: 0; padding: 20px;">
+	<div style="font: normal normal normal 12px/14px Helvetica; color: #000; padding: 5px 0;">Pozdrawiam / Kind regards</div>
+        <div style="padding: 10px 0;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; margin: 0 -20px;">
+                <div style="width: 340px;">
+                    <div style="padding: 0 20px">						
+                        <div style="font: normal normal bold 20px/24px Helvetica; color: #000; padding: 5px 0;">Kinga Kaczanowska</div>
+                        <div style="font: normal normal normal 14px/16px Helvetica; color: #000;">Junior Software Tester</span></div>
+                    </div>
+                </div>
+                <div style="width: 330px;display: flex;align-items: center;align-self: stretch;height: 56px;border-left: 1px solid #000;margin-left: -1px;">
+                    <div style="padding-left: 20px;">
+                             <a style="display: block; text-decoration: none; font: normal normal normal 11px/12px Helvetica; color: #000; padding-top: 5px;" href="mailto:kinga.kaczanowska@cadprojekt.com.pl">kinga.kaczanowska@cadprojekt.com.pl</a>
+                        <a style="display: block; text-decoration: none; font: normal normal normal 11px/12px Helvetica; color: #000; padding-top: 5px;" href="mailto:testy@cadprojekt.com.pl">testy@cadprojekt.com.pl</a>
+                    </div>
+                </div>
+                <div style="padding: 0 20px; align-self: flex-end;">
+                    <img style="height: 24px; width: auto; display: block; margin-top: 10px;" src="https://cadprojekt.com.pl/zasoby/email/logo_spjawna.png" alt="CAD PROJEKT">
+                </div>
+            </div>
+        </div>
+        <div style="font: normal normal normal 10px/14px Helvetica; color: #666; padding: 10px 0; width: 815px; max-width: 100%; border-top: 3px solid #F3951A;">
+            CAD Projekt K&A Sp.j. Dąbrowski, Sterczała, Sławek  | Poznański Park Naukowo-Technologiczny <br>
+			ul. Rubież 46 | 61-612 Poznań | Poland | NIP 779-00-34-266 | REGON 632223660 | <a style="text-decoration: none; color: #666" href="https://www.cadprojekt.com.pl">www.cadprojekt.com.pl</a> 
+        </div>
+       
+        <a style="display: block; font: normal normal normal 10px/14px Helvetica; color: #666; padding: 10px 0; text-decoration: none;" href="https://cadprojekt.com.pl/polityka-prywatnosci-sp-j" target="_blank">
+            Zapoznaj się z zasadami przetwarzania Twoich danych osobowych.
+        </a>
+    </body>
+</html>              
+
+"""
+
+
+    if user == 1:
+        footer = footer_tomasz
+    elif user == 2:
+        footer = footer_kinga
+
+    print(footer)
+
+    # Turn these into plain/html MIMEText objects
+    part1 = MIMEText(text, "plain")
+    part2 = MIMEText(footer, "html")
+
+    # Add HTML/plain-text parts to MIMEMultipart message
+    # The email client will try to render the last part first
+    message.attach(part1)
+    message.attach(part2)
+
+    # Create secure connection with server and send email
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL("poczta.cadprojekt.com.pl", 465, context=context) as server:
+        server.login(sender_email, password)
+        server.sendmail(
+            sender_email, emails, message.as_string()
+        )
+
+def open_new_window(pack):
+    
+    button4.configure(state="disabled", hover=True)
+
+    is_file = True
+    odt_name = date.today().strftime("%d.%m.%Y") + ".odt"
+  
+    newWindow = CTkToplevel(gui)
+    newWindow.title("email sender")
+    newWindow.geometry("380x400")
+
+    x = gui.winfo_x() + gui.winfo_width()//2 - newWindow.winfo_width()//2
+    y = gui.winfo_y() + gui.winfo_height()//2 - newWindow.winfo_height()//2
+    newWindow.geometry(f"+{x}+{y}")
+    newWindow.after(10, newWindow.lift)
+    
+    var_0 = IntVar()
+    var_1 = IntVar()    
+
+    if os.path.isfile(pack + "\\" + odt_name):
+        odt_file = pack + "\\" + odt_name
+        label01 = CTkLabel(newWindow, text=odt_name, fg_color="transparent", font=("Consolas", 14))
+        label01.pack(padx=(0,0), pady=(10,0), anchor=CENTER)
+    else:
+        label01 = CTkLabel(newWindow, text="Dodaj plik z listą", fg_color="transparent", font=("Consolas", 14))
+        label01.pack(padx=(0,0), pady=(10,0), anchor=CENTER)
+        is_file = False
+
+    e_button01 = CTkButton(newWindow, text="Dodaj listę", width=160, height=40, font=("Consolas", 14))
+    e_button01.pack(padx=(0,0), pady=(15,20), anchor=CENTER)
+
+
+    e_frame = CTkFrame(newWindow)
+    e_frame.configure(border_width=2, fg_color="transparent")
+    e_frame.pack()
+
+    e_radiobutton01 = CTkRadioButton(e_frame, text="Kinga", variable=var_0, value=1, font=("Consolas", 14))
+    e_radiobutton01.pack(pady=20, padx=(30, 5), side="left", anchor=N)
+    if is_file == False:
+        e_radiobutton01.configure(state="disabled")
+
+    e_radiobutton02 = CTkRadioButton(e_frame, text="Tomasz", variable=var_0, value=2, font=("Consolas", 14))
+    e_radiobutton02.pack(pady=20, padx=(5, 15), side="left", anchor=N)
+    if is_file == False:
+        e_radiobutton02.configure(state="disabled")
+
+    e_frame02 = CTkFrame(newWindow)
+    e_frame02.configure(border_width=2, fg_color="transparent")
+    e_frame02.pack(pady=(20,0), padx=(0,0))
+
+    e_radiobutton03 = CTkRadioButton(e_frame02, text="Serwis", variable=var_1, value=1, font=("Consolas", 14))
+    e_radiobutton03.pack(pady=20, padx=(30, 5), side="left", anchor=N)
+    if is_file == False:
+        e_radiobutton03.configure(state="disabled")
+
+    e_radiobutton04 = CTkRadioButton(e_frame02, text="Wszyscy", variable=var_1, value=2, font=("Consolas", 14))
+    e_radiobutton04.pack(pady=20, padx=(5, 15), side="left", anchor=N)
+    if is_file == False:
+        e_radiobutton04.configure(state="disabled")
+
+    try:
+        kafle = pack + "\\" + "MainFiles\\V4_I10x64\\kafle.dll"
+    except:
+        print("Error with 'x' variable")
+
+    if os.path.isfile(kafle):
+        label02 = CTkLabel(newWindow, text="Wersja programu: " + get_version_number(kafle), fg_color="transparent", font=("Consolas", 14))
+    else:
+        label02 = CTkLabel(newWindow, text="Wersja programu: " + "bez zmian.", fg_color="transparent", font=("Consolas", 14))
+
+    label02.pack(padx=(0,0), pady=(15,0), anchor=CENTER)
+
+    e_button02 = CTkButton(newWindow, text="Wyślij email", width=160, height=40, font=("Consolas", 14), command=lambda : send_email(var_0.get(), var_1.get(), kafle))
+    e_button02.pack(padx=(0,0), pady=(20,20), anchor=CENTER)
+    if is_file == False:
+        e_button02.configure(state="disabled")
+
+
+    newWindow.mainloop()
+
 
 
 doc = OpenDocumentText()
@@ -663,10 +921,39 @@ paragraph_style00.addElement(
 paragraph_style00.addElement(ParagraphProperties(lineheight="135%"))
 doc_s.addElement(paragraph_style00)
 
+tabstops_style = TabStops()
+tabstop_style = TabStop(position="7cm")
+tabstops_style.addElement(tabstop_style)
+tabstoppar = ParagraphProperties()
+tabstoppar.addElement(tabstops_style)
+tabparagraphstyle = Style(name="Question", family="paragraph")
+tabparagraphstyle.addElement(
+        TextProperties(attributes={"fontsize": "11pt", "fontfamily": "Calibri"})
+    )
+tabparagraphstyle.addElement(ParagraphProperties(lineheight="135%"))
+tabparagraphstyle.addElement(tabstoppar)
+doc_s.addElement(tabparagraphstyle)
+
+
+
+tabstop_style01 = TabStop(position="1.2cm")
+tabstops_style.addElement(tabstop_style01)
+tabstoppar01 = ParagraphProperties()
+tabstoppar01.addElement(tabstops_style)
+tabparagraphstyle01 = Style(name="Question", family="paragraph")
+tabparagraphstyle01.addElement(
+        TextProperties(attributes={"fontsize": "11pt", "fontfamily": "Calibri"})
+    )
+tabparagraphstyle01.addElement(ParagraphProperties(lineheight="135%"))
+tabparagraphstyle01.addElement(tabstoppar01)
+doc_s.addElement(tabparagraphstyle01)
+
+
+
 
 gui = CTk()
 
-gui.geometry("350x500")
+gui.geometry("350x550")
 gui.title("Generator")
 gui.resizable(False, False)
 
@@ -770,6 +1057,17 @@ button3 = CTkButton(
 )
 button3.pack(pady=(5, 25), anchor=CENTER)
 button3.configure(state="disabled", hover=True, border_width=1, border_color="gold")
+
+button4 = CTkButton(
+    gui,
+    text="Wyślij email",
+    width=160,
+    height=40,
+    font=("Consolas", 16),
+    command=lambda: open_new_window(new_dir)
+)
+button4.pack(pady=(5, 25), anchor=CENTER)
+button4.configure(state="disabled", hover=True)
 
 gui.mainloop()
 

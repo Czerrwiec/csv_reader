@@ -10,7 +10,7 @@ from win32api import *
 
 odt_name = date.today().strftime("%d.%m.%Y") + ".odt"
 
-pack_path = "C:\\Users\\Cad Projekt\\Desktop\\generator\\2024-06-27 x64"
+pack_path = "C:\\Users\\Czerwiec\\Desktop\\VS Code work\\csv\\2024-06-28 x64"
 
 file_version = ""
 
@@ -119,10 +119,10 @@ app.eval('tk::PlaceWindow . center')
 var_0 = IntVar()
 var_1 = IntVar()
 
-# f = open('//home//czerwiec//Pulpit//VS Code workplaces//csv_reader//data.json')
-# data = json.load(f)
-# print(data["users"][0])
-# print(data["users"][0]["displayname"])
+f = open('//home//czerwiec//Pulpit//VS Code workplaces//csv_reader//data.json')
+data = json.load(f)
+print(data["users"][0])
+print(data["users"][0]["displayname"])
 
 if os.path.isfile(pack_path + "\\" + odt_name):
     odt_file = pack_path + "\\" + odt_name
