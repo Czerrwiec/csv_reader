@@ -668,11 +668,12 @@ def send_email(user, email_receiver, kafle):
     message["To"] = ', '.join(emails)
 
     if len(kafle) > 1:
-        text = data["messeges"][1]["data"] + kafle
+        # text = data["messeges"][1]["data"] + kafle
+        text = '<font face="Segoe UI">' + data["messeges"][1]["data"] + kafle + '</font>'
     else:
-        text = data["messeges"][0]["data"]
+        # text = data["messeges"][0]["data"]
+        text = '<font face="Segoe UI">' + data["messeges"][0]["data"] + '</font>'
 
-    print(text)
 
     footer_tomasz = """\
 
@@ -760,7 +761,7 @@ def send_email(user, email_receiver, kafle):
         footer = footer_kinga
 
     # Turn these into plain/html MIMEText objects
-    part1 = MIMEText(text, "plain")
+    part1 = MIMEText(text, "html")
     part2 = MIMEText(footer, "html")
 
     # Add HTML/plain-text parts to MIMEMultipart message
@@ -863,7 +864,7 @@ def open_new_window(pack):
 
     label02.pack(padx=(0,0), pady=(15,0), anchor=CENTER)
 
-    e_button02 = CTkButton(newWindow, text="Wyślij email", width=160, height=40, font=("Consolas", 14), command=lambda : send_email(var_0.get(), var_1.get(), kafle, odt_file))
+    e_button02 = CTkButton(newWindow, text="Wyślij email", width=160, height=40, font=("Consolas", 14), command=lambda : send_email(var_0.get(), var_1.get(), kafle))
     e_button02.pack(padx=(0,0), pady=(20,20), anchor=CENTER)
     if is_file == False:
         e_button02.configure(state="disabled")
