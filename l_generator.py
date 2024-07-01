@@ -21,7 +21,7 @@ from odf.style import Style, TextProperties, ParagraphProperties, TabStop, TabSt
 from odf.text import H, P, Span
 from odf import teletype
 
-
+odt_file = None
 path = None
 csv_file = None
 folder_path = None
@@ -639,8 +639,6 @@ def get_default_csv():
     return csv_file, paths_dir
 
 def send_email(user, email_receiver, kafle):
-    print(user)
-    print(email_receiver)
 
     f = open(get_script_path() + "\\" + "users.json", encoding='utf-8')
     data = json.load(f)
@@ -651,16 +649,16 @@ def send_email(user, email_receiver, kafle):
         user = data["users"][0]["displayname"]
 
     if email_receiver == 1:
-        email_receiver = data["receivers"][0]["emails"]
+        # emails = data["receivers"][0]["emails"]
+        emails = ["tomasz.czerwinski@cadprojekt.com.pl"]
     elif email_receiver == 2:
-        email_receiver = data["receivers"][1]["emails"]
+        # emails = data["receivers"][1]["emails"]
+        emails = ["tomasz.czerwinski@cadprojekt.com.pl"]
 
-    print("")
-    print(user)
-    print(email_receiver)
 
     sender_email = "tomasz.czerwinski@cadprojekt.com.pl"
-    emails = ["tomasz.czerwinski@cadprojekt.com.pl"]
+    # sender_email = "testy@cadprojekt.com.pl"
+    # password = "testy password"
     password = "tomczer23"
 
     message = MIMEMultipart("multipart")
@@ -669,13 +667,12 @@ def send_email(user, email_receiver, kafle):
     message["From"] = sender_email
     message["To"] = ', '.join(emails)
 
-    text = data["messeges"][0]["data"]
+    if len(kafle) > 1:
+        text = data["messeges"][1]["data"] + kafle
+    else:
+        text = data["messeges"][0]["data"]
 
-    # text = "Myszowy test majla grupowego."
-
-    print(kafle)
     print(text)
-
 
     footer_tomasz = """\
 
@@ -757,13 +754,10 @@ def send_email(user, email_receiver, kafle):
 
 """
 
-
-    if user == 1:
+    if user == data["users"][0]["displayname"]:
         footer = footer_tomasz
-    elif user == 2:
+    elif user == data["users"][1]["displayname"]:
         footer = footer_kinga
-
-    print(footer)
 
     # Turn these into plain/html MIMEText objects
     part1 = MIMEText(text, "plain")
@@ -783,7 +777,19 @@ def send_email(user, email_receiver, kafle):
         )
 
 def open_new_window(pack):
+    global odt_file
+
+    def ask_for_list_to_send():
+        global odt_file
+        x = filedialog.askopenfilename()
+        while x.endswith('.odt') != True:
+            x = filedialog.askopenfilename()
+        else:
+            odt_file = x
+            label01.configure(text=os.path.basename(odt_file))
+            
     
+
     button4.configure(state="disabled", hover=True)
 
     is_file = True
@@ -810,7 +816,7 @@ def open_new_window(pack):
         label01.pack(padx=(0,0), pady=(10,0), anchor=CENTER)
         is_file = False
 
-    e_button01 = CTkButton(newWindow, text="Dodaj listę", width=160, height=40, font=("Consolas", 14))
+    e_button01 = CTkButton(newWindow, text="Dodaj listę", width=160, height=40, font=("Consolas", 14), command=ask_for_list_to_send)
     e_button01.pack(padx=(0,0), pady=(15,20), anchor=CENTER)
 
 
@@ -842,23 +848,25 @@ def open_new_window(pack):
     if is_file == False:
         e_radiobutton04.configure(state="disabled")
 
-    try:
-        kafle = pack + "\\" + "MainFiles\\V4_I10x64\\kafle.dll"
-    except:
-        print("Error with 'x' variable")
+    
+    x = pack + "\\" + "MainFiles\\V4_I10x64\\kafle.dll"
 
-    if os.path.isfile(kafle):
-        label02 = CTkLabel(newWindow, text="Wersja programu: " + get_version_number(kafle), fg_color="transparent", font=("Consolas", 14))
+    try:
+        kafle = get_version_number(x)
+    except:
+        print("error with kafle")
+
+    if os.path.isfile(x):
+        label02 = CTkLabel(newWindow, text="Wersja programu: " + kafle, fg_color="transparent", font=("Consolas", 14))     
     else:
         label02 = CTkLabel(newWindow, text="Wersja programu: " + "bez zmian.", fg_color="transparent", font=("Consolas", 14))
 
     label02.pack(padx=(0,0), pady=(15,0), anchor=CENTER)
 
-    e_button02 = CTkButton(newWindow, text="Wyślij email", width=160, height=40, font=("Consolas", 14), command=lambda : send_email(var_0.get(), var_1.get(), kafle))
+    e_button02 = CTkButton(newWindow, text="Wyślij email", width=160, height=40, font=("Consolas", 14), command=lambda : send_email(var_0.get(), var_1.get(), kafle, odt_file))
     e_button02.pack(padx=(0,0), pady=(20,20), anchor=CENTER)
     if is_file == False:
         e_button02.configure(state="disabled")
-
 
     newWindow.mainloop()
 
@@ -934,8 +942,6 @@ tabparagraphstyle.addElement(ParagraphProperties(lineheight="135%"))
 tabparagraphstyle.addElement(tabstoppar)
 doc_s.addElement(tabparagraphstyle)
 
-
-
 tabstop_style01 = TabStop(position="1.2cm")
 tabstops_style.addElement(tabstop_style01)
 tabstoppar01 = ParagraphProperties()
@@ -947,9 +953,6 @@ tabparagraphstyle01.addElement(
 tabparagraphstyle01.addElement(ParagraphProperties(lineheight="135%"))
 tabparagraphstyle01.addElement(tabstoppar01)
 doc_s.addElement(tabparagraphstyle01)
-
-
-
 
 gui = CTk()
 
@@ -1058,14 +1061,9 @@ button3 = CTkButton(
 button3.pack(pady=(5, 25), anchor=CENTER)
 button3.configure(state="disabled", hover=True, border_width=1, border_color="gold")
 
-button4 = CTkButton(
-    gui,
-    text="Wyślij email",
-    width=160,
-    height=40,
-    font=("Consolas", 16),
-    command=lambda: open_new_window(new_dir)
-)
+
+button4 = CTkButton(gui, text="Wyślij email", width=160, height=40, font=("Consolas", 16), command=lambda: open_new_window(new_dir))
+
 button4.pack(pady=(5, 25), anchor=CENTER)
 button4.configure(state="disabled", hover=True)
 
